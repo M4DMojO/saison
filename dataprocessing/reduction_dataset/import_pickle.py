@@ -1,10 +1,7 @@
 import os
 import pickle
-
-pickle_file = 'dataset_reduit.pkl'
-
-with open(pickle_file, 'rb') as f:
-    arborescence = pickle.load(f)
+import shutil
+import argparse
 
 # Fonction pour recréer l'arborescence et écrire les fichiers
 def recreer_arborescence_et_fichiers(arbo, chemin_base='dataset'):
@@ -23,6 +20,24 @@ def recreer_arborescence_et_fichiers(arbo, chemin_base='dataset'):
                 sous_dossier_path = os.path.join(nouveau_dossier, sous_dossier)
                 recreer_arborescence_et_fichiers(sous_contenu, sous_dossier_path)
 
+def main():
+    # Configuration de argparse pour gérer les arguments en ligne de commande
+    parser = argparse.ArgumentParser(description='Importer une arborescence et des fichiers depuis un pickle.')
+    parser.add_argument('pickle_file', type=str, help='Le fichier pickle à utiliser pour l\'import')
+    
+    args = parser.parse_args()
+    pickle_file = args.pickle_file
 
-recreer_arborescence_et_fichiers(arborescence)
+    # Supprimer le dossier dataset avant de faire l'import
+    if os.path.exists('dataset'):
+        shutil.rmtree('dataset')
 
+    # Charger le fichier pickle
+    with open(pickle_file, 'rb') as f:
+        arborescence = pickle.load(f)
+
+    # Recréer l'arborescence et les fichiers
+    recreer_arborescence_et_fichiers(arborescence)
+
+if __name__ == '__main__':
+    main()
