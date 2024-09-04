@@ -1,0 +1,58 @@
+/* charte graphique */
+:root {
+    --color-background-light: #f8f8f8;
+    --color-background-dark: #f0f0f0;
+    --color-border: #ccc;
+    --color-border-hover: #aaa;
+    --color-text: #333;
+    --color-background-button: #f8f8f8;
+    --color-background-button-hover: #e0e0e0;
+    --color-background-button-active: #d0d0d0;
+}
+
+
+.page_format {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.container {
+    text-align: center;
+    background-color: var(--color-background-dark);
+}
+
+.container select {
+    width: 200px;
+    padding: 10px;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+}
+
+.container button {
+    width: 200px;
+    padding: 10px;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    background-color: var(--color-background-button);
+    color: var(--color-text);
+    cursor: pointer;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+.container button:hover {
+    background-color: var(--color-background-button-hover);
+}
+
+.container button:active {
+    background-color: var(--color-background-button-active);
+    border-color: var(--color-border-hover);
+}

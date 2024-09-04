@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en" class="page_format">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../static/common.css">
+    <link rel="stylesheet" href="../static/index.css">
+    <title>Seasonal Fruits and Veggies AI Calendar</title>
+</head>
+<body>
+    <div class="container">
+        <h1>Seasonal Fruits <br/> and Veggies AI Calendar</h1>
+      
+        <input type="file" name="img_ipt" id="img_ipt" accept="image/png, image/jpeg" onchange="handleImageUpload()" style="display:none;"/>
+        
+        <div id="image-preview">
+            <img id="uploaded-image">
+            <div id="error-message">Please select a picture.</div>
+        </div>
+
+        <br/>
+
+        <select name="model_selection">
+            <option value="">-- Select a model --</option>
+            <option value="model1">Model 1</option>
+            <option value="model2">Model 2</option>
+            <option value="model3">Model 3</option>
+        </select>
+
+        <br/>
+
+        <select name="month_selection">
+            <option value="">-- Select month --</option>
+            <option value="01">January</option>
+            <option value="02">February</option>
+            <option value="03">March</option>
+            <option value="04">April</option>
+            <option value="05">May</option>
+            <option value="06">June</option>
+            <option value="07">July</option>
+            <option value="08">August</option>
+            <option value="09">September</option>
+            <option value="10">October</option>
+            <option value="11">November</option>
+            <option value="12">December</option>
+        </select>
+
+        <br/>
+
+        <select name="country_selection">
+            <option value="">-- Select country --</option>
+            <option value="US">United States</option>
+            <option value="CA">Canada</option>
+            <option value="UK">United Kingdom</option>
+            <option value="AU">Australia</option>
+            <option value="IN">India</option>
+            <option value="FR">France</option>
+        </select>
+
+        <br/>
+
+        <button>Check</button>
+    </div>
+    
+    <script>
+        function handleImageUpload() {
+            const fileInput = document.getElementById('img_ipt');
+            const uploadedImage = document.getElementById('uploaded-image');
+            const errorMessage = document.getElementById('error-message');
+            const imagePreview = document.getElementById('image-preview');
+            const chooseFileText = document.getElementById('choose-file-text');
+
+            const file = fileInput.files[0];
+
+            if (file) {
+                // Validate the file type
+                const validTypes = ['image/png', 'image/jpeg'];
+                if (!validTypes.includes(file.type)) {
+                    errorMessage.textContent = 'Veuillez sélectionner une image au format PNG ou JPEG.';
+                    errorMessage.style.display = 'block';
+                    uploadedImage.style.display = 'none';
+                    chooseFileText.style.display = 'block';
+                    imagePreview.style.backgroundColor = '#ccc'; // Keep gray background when image is hidden
+                    return;
+                }
+                
+                // Create a URL for the selected image and display it
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    uploadedImage.src = e.target.result;
+                    uploadedImage.style.display = 'block';
+                    errorMessage.style.display = 'none';
+                    chooseFileText.style.display = 'none';
+                    imagePreview.style.backgroundColor = 'transparent'; // Remove gray background when image is displayed
+                    imagePreview.style.border = 'none'; // Remove dashed border when image is displayed
+                };
+                reader.readAsDataURL(file);
+            } else {
+                // If no file is selected, reset to initial state
+                errorMessage.textContent = 'Veuillez sélectionner une image.';
+                errorMessage.style.display = 'block';
+                uploadedImage.style.display = 'none';
+                chooseFileText.style.display = 'block';
+                imagePreview.style.backgroundColor = '#ccc'; // Show gray background
+                imagePreview.style.border = '2px dashed #5c5959'; // Keep dashed border
+            }
+        }
+
+        // Add click event listener to open file dialog when the gray area is clicked
+        document.getElementById('image-preview').addEventListener('click', function() {
+            document.getElementById('img_ipt').click();
+        });
+    </script>
+</body>
+</html>
