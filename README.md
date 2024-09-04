@@ -36,5 +36,6 @@ fi
 ## instalation de python et des packages
 
 
-## transfert des données depuis la machine locale
-`gcloud compute scp --recurse yolo beltranluc0@vm-yolo:~/code/BeltranLuc/saison/model_yolo/`
+## transfert des données depuis la machine locale 
+se placer dans le dossier data saison/data/yolo_total
+`gcloud compute scp --recurse datasets beltranluc0@vm-yolo:~/code/BeltranLuc/saison/data/yolo_total/`
