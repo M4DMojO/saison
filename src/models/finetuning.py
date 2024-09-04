@@ -20,41 +20,8 @@ def scheduler(epoch, lr):
         return lr * 0.9
     return lr
 
-def cropper(image_path:str, save_path:str, label_path:str):
-    img = Image.open(image_path)
-    img_name = os.basename(image_path).replace('.jpg', '')
-
-    os.makedirs(save_path, exist_ok=True)
-
-    with open(label_path, 'r') as labels:
-        counter = 0
-        for line in labels:
-            l = line.split(' ')
-            if len(l) == 5:
-                x_center, y_center, w, h = l[1], l[2], l[3], l[4]
-            else: #Pour Bell pepper
-                x_center, y_center, w, h = l[2], l[3], l[4], l[5]
-
-            img_w, img_h = img.size
-            x_center = x_center * img_w
-            y_center = y_center * img_h
-            w = w * img_w
-            h = h * img_h
-
-            x1 = x_center - (w/2)
-            x2 = x_center + (w/2)
-            y1 = y_center - (h/2)
-            y2 = y_center + (h/2)
-
-            img_tmp = img.crop(x1, y1, x2, y2)
-            img_tmp.save(save_path.replace(".jpg", ''.join(['_', str(counter), '.jpg'])))
-
-            counter += 1
-   
-
-def make_train_val_folder_(root:str, train_path:str, val_path:str, 
-                           nb_img:int=400, val_split:int=0.2, 
-                           crop:bool=False, label_path:str=None):
+def make_train_val_folder(root:str, train_path:str, val_path:str, 
+                           nb_img:int=400, val_split:int=0.2):
   for dir in os.listdir(root):
     root_dir = os.path.join(root, dir)
     train_dir = os.path.join(train_path, dir)
@@ -73,28 +40,24 @@ def make_train_val_folder_(root:str, train_path:str, val_path:str,
         dest = os.path.join(val_dir, images[i])
       else:
         break
-      if crop:
-        if label_path == None:
-            raise Exception("Please provide a label path")
-        cropper(source, dest, label_path)
-      else:
-        shutil.copy2(source, dest)
+
+    shutil.copy2(source, dest)
 
 
-def make_generator(path:str):
+def make_generator(train_path:str, val_path:str):
     datagen = ImageDataGenerator(
         rescale=1./255,
         vertical_flip=True,
         horizontal_flip=True)
     
     train_generator = datagen.flow_from_directory(
-        os.path.join(path, 'train'),  # this is the target directory
+        train_path,  # this is the target directory
         target_size=VGG_SIZE,  # all images will be resized to 150x150
         batch_size=BATCH_SIZE,
         class_mode='categorical')
     
     val_generator = datagen.flow_from_directory(
-        os.path.join(path, 'val'),  # this is the target directory
+        val_path,  # this is the target directory
         target_size=VGG_SIZE,  # all images will be resized to 150x150
         batch_size=BATCH_SIZE,
         class_mode='categorical')
