@@ -5,18 +5,14 @@ from tensorflow.keras.applications.vgg16 import VGG16
 from tensorflow.keras.callbacks import LearningRateScheduler, ModelCheckpoint
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
-import numpy as np
-import os
 from PIL import Image
+
+import shutil
+import os
 
 VGG_IMG_SHAPE = (224, 224, 3)
 VGG_SIZE = (224, 224)
 BATCH_SIZE = 64
-
-def img_resize(img):
-  img = Image.fromarray(img.astype('uint8'), 'RGB')
-  img = img.resize(VGG_IMG_SHAPE)
-  return np.array(img)
 
 
 def scheduler(epoch, lr):
@@ -24,7 +20,68 @@ def scheduler(epoch, lr):
         return lr * 0.9
     return lr
 
-def make_datasets(path:str):
+def cropper(image_path:str, save_path:str, label_path:str):
+    img = Image.open(image_path)
+    img_name = os.basename(image_path).replace('.jpg', '')
+
+    os.makedirs(save_path, exist_ok=True)
+
+    with open(label_path, 'r') as labels:
+        counter = 0
+        for line in labels:
+            l = line.split(' ')
+            if len(l) == 5:
+                x_center, y_center, w, h = l[1], l[2], l[3], l[4]
+            else: #Pour Bell pepper
+                x_center, y_center, w, h = l[2], l[3], l[4], l[5]
+
+            img_w, img_h = img.size
+            x_center = x_center * img_w
+            y_center = y_center * img_h
+            w = w * img_w
+            h = h * img_h
+
+            x1 = x_center - (w/2)
+            x2 = x_center + (w/2)
+            y1 = y_center - (h/2)
+            y2 = y_center + (h/2)
+
+            img_tmp = img.crop(x1, y1, x2, y2)
+            img_tmp.save(save_path.replace(".jpg", ''.join(['_', str(counter), '.jpg'])))
+
+            counter += 1
+   
+
+def make_train_val_folder_(root:str, train_path:str, val_path:str, 
+                           nb_img:int=400, val_split:int=0.2, 
+                           crop:bool=False, label_path:str=None):
+  for dir in os.listdir(root):
+    root_dir = os.path.join(root, dir)
+    train_dir = os.path.join(train_path, dir)
+    val_dir = os.path.join(val_path, dir)
+
+    os.makedirs(train_dir, exist_ok=True)
+    os.makedirs(val_dir, exist_ok=True)
+
+    images = [f for f in os.listdir(root_dir) if f.endswith('.jpg')]
+
+    for i in range(len(images)):
+      source = os.path.join(root_dir, images[i])
+      if i < int(nb_img * (1 - val_split)):
+        dest = os.path.join(train_dir, images[i])
+      elif i < nb_img:
+        dest = os.path.join(val_dir, images[i])
+      else:
+        break
+      if crop:
+        if label_path == None:
+            raise Exception("Please provide a label path")
+        cropper(source, dest, label_path)
+      else:
+        shutil.copy2(source, dest)
+
+
+def make_generator(path:str):
     datagen = ImageDataGenerator(
         rescale=1./255,
         vertical_flip=True,
@@ -57,7 +114,8 @@ def fit_and_export(train_generator, validation_generator,
     """
 
     #Load vgg16
-    true_vgg = VGG16(input_shape=shape, weights='imagenet', include_top=False)
+    true_vgg = VGG16(input_shape=shape, weights='imagenet', 
+                     include_top=False)
 
     for layer in true_vgg.layers:
         layer.trainable = False
@@ -84,10 +142,9 @@ def fit_and_export(train_generator, validation_generator,
                                 verbose=1)
 
     #Fit from generator
-    model.fit_generator(train_generator, validation_data=validation_generator,
+    model.fit(train_generator, validation_data=validation_generator,
                         epochs=epochs, 
-                        callbacks=[schedule, chekpoint], 
-                        batch_size=64)
+                        callbacks=[schedule, chekpoint])
     #Export model
     model.export(
                 save_path, 
