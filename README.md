@@ -34,3 +34,7 @@ fi
 
 
 ## instalation de python et des packages
+
+
+## transfert des données depuis la machine locale
+`gcloud compute scp --recurse yolo beltranluc0@vm-yolo:~/code/BeltranLuc/saison/model_yolo/`
