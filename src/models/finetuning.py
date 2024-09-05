@@ -124,8 +124,8 @@ if __name__ == "__main__":
         if arg == "vgg":
 
             folder = "vgg_classification"
-            save_path = os.path.join("src", "models", folder , "big", "model", "weights.h5")
-            chekcpoint_path = os.path.join("src", "models", folder , "big", "checkpoint", 'weights.h5')
+            save_path = os.path.join("src", "models", folder , "big", "model", "vgg16.weights.h5")
+            chekcpoint_path = os.path.join("src", "models", folder , "big", "checkpoint", 'vgg16.weights.h5')
 
             root_dir = os.path.join('data', folder, 'datasets')
             train_dir = os.path.join("data", folder, 'train')
