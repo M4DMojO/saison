@@ -5,13 +5,13 @@ from PIL import Image
 
 def openImage(filename):
     try:
-        img = Image.open( os.path.join('..', 'data', 'yolo_total', 'datasets', 'images', 'train', filename.split(".")[0] + '.jpg' ))
+        img = Image.open( os.path.join('data', 'yolo_total', 'datasets', 'images', 'train', filename.split(".")[0] + '.jpg' ))
         return img
     except:
         pass  
 
     try:
-        img = Image.open( os.path.join('..', 'data', 'yolo_total', 'datasets', 'images', 'val', filename.split(".")[0] + '.jpg' ))
+        img = Image.open( os.path.join('data', 'yolo_total', 'datasets', 'images', 'val', filename.split(".")[0] + '.jpg' ))
         return img
     except:
         pass  
@@ -209,14 +209,14 @@ def traiter_donnees(racine, nouvelle_racine, max_elements, avec_boundingbox=Fals
                     shutil.copy2(chemin_image_source, chemin_image_dest)
 
 def data_vgg_cls():
-    racine = os.path.join("..", "data", "brut_")
-    nouvelle_racine =  os.path.join("..", "data", 'vgg_classification', "datasets")
+    racine = os.path.join("data", "brut_")
+    nouvelle_racine =  os.path.join("data", 'vgg_classification', "datasets")
     max_elements = 400
     traiter_donnees(racine, nouvelle_racine, max_elements, avec_boundingbox=False)
 
 def data_vgg_seg():
-    racine = os.path.join("..", "data", "brut_")
-    nouvelle_racine =  os.path.join("..", "data", 'yolo_segmentation', "vgg_datasets")
+    racine = os.path.join("data", "brut_")
+    nouvelle_racine =  os.path.join("data", 'yolo_segmentation', "vgg_datasets")
     max_elements = 400
     traiter_donnees(racine, nouvelle_racine, max_elements, avec_boundingbox=True)
 
@@ -254,7 +254,7 @@ def data_total():
 
 
     # path sortie
-    dataset_path = os.path.join('..', 'data', 'yolo_total', 'datasets')
+    dataset_path = os.path.join('data', 'yolo_total', 'datasets')
 
     # Delete existing directories if necessary
     delete_folder(os.path.join(dataset_path, 'images'))
@@ -271,15 +271,15 @@ def data_total():
         source_folder = os.path.join('..', 'data', 'brut_')
         fruit_list = sorted(os.listdir(source_folder))
         fruit_to_idx = {fruit : i for i, fruit in enumerate(fruit_list)}
-        modify_txt_files(os.path.join("..", "data", "yolo_total", "datasets","labels", "train"), 
+        modify_txt_files(os.path.join("data", "yolo_total", "datasets","labels", "train"), 
                         fruit_to_idx)
-        modify_txt_files(os.path.join("..", "data", "yolo_total", "datasets","labels", "val"), 
+        modify_txt_files(os.path.join("data", "yolo_total", "datasets","labels", "val"), 
                         fruit_to_idx)
 
 
 def data_seg():
-    source_folder = os.path.join("..", "data", "yolo_total", "datasets")
-    destination_folder = os.path.join("..", "data", "yolo_segmentation", "datasets")
+    source_folder = os.path.join("data", "yolo_total", "datasets")
+    destination_folder = os.path.join("data", "yolo_segmentation", "datasets")
 
     # Copier et modifier
     copier_et_modifier(source_folder, destination_folder)
