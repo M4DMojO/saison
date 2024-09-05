@@ -14,9 +14,9 @@ setuptools.setup(
     description='for later',
     packages=setuptools.find_packages(),
     install_requires=[
-        "scikit-learn==0.22.1",
-        "pandas==1.0.1",
-        "click==7.0"
+        "-e .",
+        "click==7.0", 
+        "Pillow==9.1.1"
     ],
     entry_points='''
     [console_scripts]
