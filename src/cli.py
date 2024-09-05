@@ -28,10 +28,12 @@ def finetuning(type_finetuning:str='big'):
     if type_finetuning == 'small':
         folder = "yolo_segmentation"
         label_dir = os.path.join("data", folder , 'val')
-        save_path = os.path.join("src", "models", 'yolo_segmentation', 'vgg')
+        save_path = os.path.join("src", "models", folder, 'vgg')
     else:
         folder = "vgg_classification"
-        save_path = os.path.join("src", "models", 'vgg_classification')
+        
+    save_path = os.path.join("src", "models", folder , type_finetuning, "model")
+    chekcpoint_path = os.path.join("src", "models", folder , type_finetuning, "ccheckpoint")
 
     root_dir = os.path.join('data', folder, 'datasets')
     train_dir = os.path.join("data", folder, 'train')
@@ -40,6 +42,4 @@ def finetuning(type_finetuning:str='big'):
     make_train_val_folder(root_dir, train_path=train_dir, val_path=val_dir)
     train_gen, val_gen = make_generator(train_path=train_dir, val_path=val_dir)
 
-    save_path = os.path.join("src", "models", 'vgg_classification')
-
-    fit_and_export(train_gen, val_gen)
+    fit_and_export(train_gen, val_gen, save_path=save_path, checkpoint_path=chekcpoint_path)
