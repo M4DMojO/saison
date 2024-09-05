@@ -14,8 +14,7 @@ setuptools.setup(
     description='for later',
     packages=setuptools.find_packages(),
     install_requires=[
-        "-e .",
-        "click==7.0", 
+        "click==8.1.3", 
         "Pillow==9.1.1"
     ],
     entry_points='''

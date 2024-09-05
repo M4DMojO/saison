@@ -1,15 +1,15 @@
 import click
 import os
-from models.finetuning import make_train_val_folder, make_generator, fit_and_export
-from data_cleaner import data_vgg_cls, data_seg, data_total, data_vgg_seg
+from src.models.finetuning import make_train_val_folder, make_generator, fit_and_export
+from src.data_cleaner import data_vgg_cls, data_seg, data_total, data_vgg_seg
 
 
 @click.group(name='"saison')
 def saison():
     pass
 
-@saison.command(name="datamaker", help="make the data from content/OID/Dataset")
-@click.argument("goal", nargs=1, help='seg|vgg|total')
+@saison.command(name="datamaker", help="Make the data from brut_. can be either vgg|seg|total")
+@click.argument("goal", nargs=1)
 def datamaker(goal:str):
     if goal == 'total':
         data_total()
