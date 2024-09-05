@@ -175,4 +175,5 @@ images/
 labels/
 _brut/
 
-
+# fichier de poids 
+*.pt
