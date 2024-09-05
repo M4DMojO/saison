@@ -119,8 +119,8 @@ def fit_and_export(train_generator, validation_generator,
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:
-        arg = sys.argv[0]
-        
+        arg = sys.argv[1]
+
         if arg == "vgg":
 
             folder = "vgg_classification"
