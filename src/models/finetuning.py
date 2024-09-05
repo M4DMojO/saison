@@ -32,17 +32,16 @@ def make_train_val_folder(root:str, train_path:str, val_path:str,
     os.makedirs(val_dir, exist_ok=True)
 
     images = [f for f in os.listdir(root_dir) if f.endswith('.jpg')]
-
     for i in range(len(images)):
-      source = os.path.join(root_dir, images[i])
-      if i < int(nb_img * (1 - val_split)):
-        dest = os.path.join(train_dir, images[i])
-      elif i < nb_img:
-        dest = os.path.join(val_dir, images[i])
-      else:
-        break
+        source = os.path.join(root_dir, images[i])
+        if i < int(nb_img * (1 - val_split)):
+            dest = os.path.join(train_dir, images[i])
+        elif i < nb_img:
+            dest = os.path.join(val_dir, images[i])
+        else:
+            break
 
-    shutil.copy2(source, dest)
+        shutil.copy2(source, dest)
 
 
 def make_generator(train_path:str, val_path:str):
