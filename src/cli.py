@@ -32,8 +32,8 @@ def finetuning(type_finetuning:str='big'):
     else:
         folder = "vgg_classification"
         
-    save_path = os.path.join("src", "models", folder , type_finetuning, "model")
-    chekcpoint_path = os.path.join("src", "models", folder , type_finetuning, "ccheckpoint")
+    save_path = os.path.join("src", "models", folder , type_finetuning, "model", "weights.h5")
+    chekcpoint_path = os.path.join("src", "models", folder , type_finetuning, "checkpoint", "weights.h5")
 
     root_dir = os.path.join('data', folder, 'datasets')
     train_dir = os.path.join("data", folder, 'train')

@@ -124,8 +124,8 @@ if __name__ == "__main__":
         if arg == "vgg":
 
             folder = "vgg_classification"
-            save_path = os.path.join("src", "models", folder , "big", "model")
-            chekcpoint_path = os.path.join("src", "models", folder , "big", "ccheckpoint")
+            save_path = os.path.join("src", "models", folder , "big", "model", "weights.h5")
+            chekcpoint_path = os.path.join("src", "models", folder , "big", "checkpoint", 'weights.h5')
 
             root_dir = os.path.join('data', folder, 'datasets')
             train_dir = os.path.join("data", folder, 'train')
@@ -133,7 +133,5 @@ if __name__ == "__main__":
 
             make_train_val_folder(root_dir, train_path=train_dir, val_path=val_dir)
             train_gen, val_gen = make_generator(train_path=train_dir, val_path=val_dir)
-
-            save_path = os.path.join("src", "models", 'vgg_classification')
 
             fit_and_export(train_gen, val_gen, save_path, chekcpoint_path)
