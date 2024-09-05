@@ -9,6 +9,7 @@ from PIL import Image
 
 import shutil
 import os
+import sys
 
 VGG_IMG_SHAPE = (224, 224, 3)
 VGG_SIZE = (224, 224)
@@ -114,3 +115,24 @@ def fit_and_export(train_generator, validation_generator,
                 format='tf_saved_model')
 
     return model
+
+
+if __name__ == "__main__":
+    if len(sys.argv) > 1:
+        arg = sys.argv[0]
+        
+        if arg == "vgg":
+
+            folder = "vgg_classification"
+            save_path = os.path.join("src", "models", 'vgg_classification')
+
+            root_dir = os.path.join('data', folder, 'datasets')
+            train_dir = os.path.join("data", folder, 'train')
+            val_dir = os.path.join("data", folder, 'val')
+
+            make_train_val_folder(root_dir, train_path=train_dir, val_path=val_dir)
+            train_gen, val_gen = make_generator(train_path=train_dir, val_path=val_dir)
+
+            save_path = os.path.join("src", "models", 'vgg_classification')
+
+            fit_and_export(train_gen, val_gen)
