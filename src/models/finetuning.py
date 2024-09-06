@@ -109,7 +109,7 @@ def get_latest(weights_dir:str):
 def load_model_from_weights(weights_dir:str, shape:tuple[int], from_pretrained:bool=False):
     model = make_vgg_architecture(shape, from_pretrained)
     latest = get_latest(weights_dir)
-    model.load_weights(os.join(weights_dir, latest))
+    model.load_weights(os.path.join(weights_dir, latest))
     return model
 
 
