@@ -39,3 +39,7 @@ fi
 ## transfert des données depuis la machine locale 
 se placer dans le dossier data saison/data/yolo_total
 `gcloud compute scp --recurse datasets beltranluc0@vm-yolo:~/code/BeltranLuc/saison/data/yolo_total/`
+
+
+## transférer un fichier vers un bucket 
+`gsutil cp models/yolo_total/runs/detect/train7/weights/best.pt gs://yolo_total_weights/iter1.pt`
