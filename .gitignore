@@ -179,4 +179,5 @@ _brut/
 *.pt
 
 # fichier nohup
-nohup.out
+# nohup.out # on garde pour avoir une trace des entrainements 
+
