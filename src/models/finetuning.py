@@ -64,46 +64,31 @@ def make_generator(train_path:str, val_path:str):
     
     return train_generator, val_generator
 
-def make_vgg_architecture() -> Model:
+def make_vgg_architecture(shape:tuple[int], from_pretrained:bool=False) -> Model:
+    if from_pretrained:
+        weights='imagenet'
+    else:
+        weights=None
 
-    input = Input(VGG_IMG_SHAPE, name="input")
-    #block1
-    block1_c1 = Conv2D(64, kernel_size=(3,3), activation='relu')(input)
-    block1_c2 = Conv2D(64, kernel_size=(3,3), activation='relu')(block1_c1)
-    pool1 = MaxPool2D(pool_size=(2,2))(block1_c2)
+    true_vgg = VGG16(input_shape=shape, weights=weights, 
+                    include_top=False)
 
-    #block2
-    block2_c1 = Conv2D(128, kernel_size=(3,3), activation='relu')(pool1)
-    block2_c2 = Conv2D(128, kernel_size=(3,3), activation='relu')(block2_c1)
-    pool2 = MaxPool2D(pool_size=(2,2))(block2_c2)
-
-    #block3
-    block3_c1 = Conv2D(256, kernel_size=(3,3), activation='relu')(pool2)
-    block3_c2 = Conv2D(256, kernel_size=(3,3), activation='relu')(block3_c1)
-    block3_c3 = Conv2D(256, kernel_size=(3,3), activation='relu')(block3_c2)
-    pool3 = MaxPool2D(pool_size=(2,2))(block3_c3)
-
-    #block4
-    block4_c1 = Conv2D(512, kernel_size=(3,3), activation='relu')(pool3)
-    block4_c2 = Conv2D(512, kernel_size=(3,3), activation='relu')(block4_c1)
-    block4_c3 = Conv2D(512, kernel_size=(3,3), activation='relu')(block4_c2)
-    pool4 = MaxPool2D(pool_size=(2,2))(block4_c3)
-
-    #block5
-    block5_c1 = Conv2D(512, kernel_size=(3,3), activation='relu')(pool4)
-    block5_c2 = Conv2D(512, kernel_size=(3,3), activation='relu')(block5_c1)
-    block5_c3 = Conv2D(512, kernel_size=(3,3), activation='relu')(block5_c2)
-    pool5 = MaxPool2D(pool_size=(2,2))(block5_c3)
-
-    #head
-    flatten = Flatten()(pool5)
+    for layer in true_vgg.layers:
+        layer.trainable = False
+    
+    #Make new head
+    flatten = Flatten()(true_vgg.output)
     d = Dense(4096, activation='relu')(flatten)
     drop = Dropout(0.5)(d)
     output = Dense(10, activation='softmax')(drop)
 
-    model = Model(inputs=input, outputs=output) 
+    #Transfer Learning
+    model = Model(inputs=true_vgg.input, 
+                outputs=output, 
+                name='custom_vgg16')
 
     return model
+
 
 def get_latest(weights_dir:str):
     onlyfiles = [f for f in os.listdir(weights_dir) if os.path.isfile(os.path.join(weights_dir, f))]
@@ -121,8 +106,8 @@ def get_latest(weights_dir:str):
         index_max = max(enumerate(nb), key=lambda x: x[1])[0]
         return onlyfiles[index_max]
 
-def load_model_from_weights(weights_dir:str):
-    model = make_vgg_architecture()
+def load_model_from_weights(weights_dir:str, shape:tuple[int], from_pretrained:bool=False):
+    model = make_vgg_architecture(shape, from_pretrained)
     latest = get_latest(weights_dir)
     print(latest)
     model.load_weights(latest)
@@ -141,27 +126,7 @@ def fit_and_export(train_generator, validation_generator,
     Returns the model.
     """
 
-    if from_pretrained:
-        model = load_model_from_weights(checkpoint_dir)
-
-    else:
-        #Load vgg16
-        true_vgg = VGG16(input_shape=shape, weights='imagenet', 
-                        include_top=False)
-
-        for layer in true_vgg.layers:
-            layer.trainable = False
-        
-        #Make new head
-        flatten = Flatten()(true_vgg.output)
-        d = Dense(4096, activation='relu')(flatten)
-        drop = Dropout(0.5)(d)
-        output = Dense(10, activation='softmax')(drop)
-
-        #Transfer Learning
-        model = Model(inputs=true_vgg.input, 
-                    outputs=output, 
-                    name='custom_vgg16')
+    model = load_model_from_weights(checkpoint_dir, shape, from_pretrained)
 
     model.compile(loss='categorical_crossentropy',
                         optimizer='adam',
