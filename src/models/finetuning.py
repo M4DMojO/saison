@@ -109,8 +109,7 @@ def get_latest(weights_dir:str):
 def load_model_from_weights(weights_dir:str, shape:tuple[int], from_pretrained:bool=False):
     model = make_vgg_architecture(shape, from_pretrained)
     latest = get_latest(weights_dir)
-    print(latest)
-    model.load_weights(latest)
+    model.load_weights(os.join(weights_dir, latest))
     return model
 
 
@@ -125,8 +124,10 @@ def fit_and_export(train_generator, validation_generator,
     vgg16 model for the classification task.
     Returns the model.
     """
-
-    model = load_model_from_weights(checkpoint_dir, shape, from_pretrained)
+    if from_pretrained:
+        model = load_model_from_weights(checkpoint_dir, shape, from_pretrained)
+    else:
+        model = make_vgg_architecture(shape, False)
 
     model.compile(loss='categorical_crossentropy',
                         optimizer='adam',
