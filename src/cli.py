@@ -57,16 +57,21 @@ def train_val_fol(task:str="vgg", nb_img:int=400):
               '-ckpt', 
               default=False, 
               type=bool)
-def finetuning(type_finetuning:str='big', from_checkpoint:bool=False):
+@click.option('--epochs', 
+              '-e', 
+              default=20, 
+              type=int)
+def finetuning(type_finetuning:str='big',
+               from_checkpoint:bool=False,
+               epochs:int=20):
 
     if type_finetuning == 'small':
         folder = "yolo_segmentation"
-        label_dir = os.path.join("data", folder , 'val')
         save_path = os.path.join("src", "models", folder, 'vgg')
     else:
         folder = "vgg_classification"
         
-    save_path = os.path.join("src", "models", folder , type_finetuning, "model", "vgg_classification.weights.h5")
+    save_path = os.path.join("src", "models", folder , type_finetuning, "vgg_classification.h5")
     chekcpoint_dir = os.path.join("src", "models", folder , type_finetuning, "checkpoint")
 
     root_dir = os.path.join('data', folder, 'datasets')
@@ -76,4 +81,5 @@ def finetuning(type_finetuning:str='big', from_checkpoint:bool=False):
     make_train_val_folder(root_dir, train_path=train_dir, val_path=val_dir)
     train_gen, val_gen = make_generator(train_path=train_dir, val_path=val_dir)
 
-    fit_and_export(train_gen, val_gen, save_path=save_path, checkpoint_dir=chekcpoint_dir, from_pretrained=from_checkpoint)
+    fit_and_export(train_gen, val_gen, save_path=save_path, checkpoint_dir=chekcpoint_dir, from_pretrained=from_checkpoint,
+                   epochs=epochs)

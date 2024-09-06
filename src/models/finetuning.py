@@ -4,7 +4,6 @@ from tensorflow.keras.utils import to_categorical
 from tensorflow.keras.applications.vgg16 import VGG16
 from tensorflow.keras.callbacks import LearningRateScheduler, ModelCheckpoint
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
-from tensorflow.train import latest_checkpoint
 
 from PIL import Image
 
@@ -106,12 +105,27 @@ def make_vgg_architecture() -> Model:
 
     return model
 
+def get_latest(weights_dir:str):
+    onlyfiles = [f for f in os.listdir(weights_dir) if os.path.isfile(os.path.join(weights_dir, f))]
+    if len(onlyfiles) == 1:
+        if "weights.h5" in onlyfiles[0]:
+            return onlyfiles[0]
+        raise Exception("No weights.h5")
+    elif len(onlyfiles) == 0:
+        raise Exception("No weights.h5")
+    else:
+        onlyfiles = [f for f in onlyfiles if ".weights.h5" in f]
+        nb = [f.replace("vgg16-", "").split('.')[0] for f in onlyfiles]
+        nb = list(map(int, nb))
+        #arg max
+        index_max = max(enumerate(nb), key=lambda x: x[1])[0]
+        return onlyfiles[index_max]
+
 def load_model_from_weights(weights_dir:str):
-
     model = make_vgg_architecture()
-    latest = latest_checkpoint(weights_dir)
+    latest = get_latest(weights_dir)
+    print(latest)
     model.load_weights(latest)
-
     return model
 
 
@@ -168,7 +182,7 @@ def fit_and_export(train_generator, validation_generator,
     #Export model
     model.export(
                 save_path, 
-                format='tf_saved_model')
+                format='h5')
 
     return model
 
@@ -180,7 +194,7 @@ if __name__ == "__main__":
         if arg == "vgg":
 
             folder = "vgg_classification"
-            save_path = os.path.join("src", "models", folder , "big", "model", "vgg_classification.weights.h5")
+            save_path = os.path.join("src", "models", folder , "big", "model", "vgg_classification.h5")
             chekcpoint_dir = os.path.join("src", "models", folder , "big", "checkpoint")
 
             root_dir = os.path.join('data', folder, 'datasets')
