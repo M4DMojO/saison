@@ -61,9 +61,14 @@ def train_val_fol(task:str="vgg", nb_img:int=400):
               '-e', 
               default=20, 
               type=int)
+@click.option('--from_epoch', 
+              '-f', 
+              default=0, 
+              type=int)
 def finetuning(type_finetuning:str='big',
                from_checkpoint:bool=False,
-               epochs:int=20):
+               epochs:int=20, 
+               from_epoch:int=0):
 
     if type_finetuning == 'small':
         folder = "yolo_segmentation"
@@ -82,4 +87,4 @@ def finetuning(type_finetuning:str='big',
     train_gen, val_gen = make_generator(train_path=train_dir, val_path=val_dir)
 
     fit_and_export(train_gen, val_gen, save_path=save_path, checkpoint_dir=chekcpoint_dir, from_pretrained=from_checkpoint,
-                   epochs=epochs)
+                   epochs=epochs, from_epoch)
