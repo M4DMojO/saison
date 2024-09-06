@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en" class="page_format">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../static/common.css">
+    <link rel="stylesheet" href="../static/result.css">
+    <title>Seasonal Fruits and Veggies AI Calendar</title>
+</head>
+<body>
+    <div class="container">
+        <h1>Seasonal Fruits <br/> and Veggies AI Calendar</h1>
+            <div id="image-preview">
+                <!-- <img name="img_out" id="uploaded-image" src="{{ output_dict.image_path }}" alt="Uploaded Image"> -->
+                <img name="img_out" id="uploaded-image" src="../static/images/0a27032c2d991a05.jpg" alt="Uploaded Image">
+            </div>
+
+
+            <div id="result-container">
+                <!-- {% for item in output_dict.results %}
+                    <p class="saison_{{ item.class }}">
+                        This is a {{ item.fruit_name }} <br/>
+                        Seasonality : {{ item.fruit_month }}
+                    </p>
+                {% end for %} -->
+
+                <p>
+                    This is a *nom du fruit* (*x* %)<br/>
+                    Seasonality : <span class="saison_good">*range de saisonalité*</span>
+                </p>
+                <p class="saison_avg">
+                    This is a *nom du fruit* <br/>
+                    Seasonality : *range de saisonalité*
+                </p>
+                <p class="saison_bad">
+                    This is a *nom du fruit* <br/>
+                    Seasonality : *range de saisonalité*
+                </p>
+            </div>
+
+    </div>
+    
+    <script>
+    </script>
+</body>
+</html>
