@@ -152,7 +152,6 @@ def cropper(image_path:str, save_path:str, label_path:str):
         counter = 0
         for line in labels:
             l = line.split(' ')
-            print(line)
             if len(l) == 5:
                 x_center, y_center, w, h = l[1], l[2], l[3], l[4]
             else: #Pour Bell pepper
@@ -167,17 +166,13 @@ def cropper(image_path:str, save_path:str, label_path:str):
             x2 = x_center + (img_w/2)
             y1 = y_center - (img_h/2)
             y2 = y_center + (img_h/2)
-            print(x_center)
-            print(img_w)
-            print("before cropping")
             img_tmp = img.crop((x1, y1, x2, y2))
-            print("after cropping")
+
             try:
                 img_tmp.save(save_path.replace(".jpg", ''.join(['_', str(counter), '.jpg'])), "JPEG")
             except IOError as e:
                 print("Can't save")
                 print(f"Error saving image: {e}")
-            print("after saving")
 
             counter += 1
 
