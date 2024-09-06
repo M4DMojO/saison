@@ -1,0 +1,11 @@
+.saison_good{
+    color: var(--color-pos); 
+}
+
+.saison_avg{
+    color: var(--color-avg);
+}
+
+.saison_bad{
+    color: var(--color-neg);
+}

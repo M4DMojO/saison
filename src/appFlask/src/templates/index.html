@@ -8,12 +8,12 @@
     <title>Seasonal Fruits and Veggies AI Calendar</title>
 </head>
 <body>
-    <div class="container">
+    <div >
         <h1>Seasonal Fruits <br/> and Veggies AI Calendar</h1>
       
-        <input type="file" name="img_ipt" id="img_ipt" accept="image/png, image/jpeg" onchange="handleImageUpload()" style="display:none;"/>
+        <input type="file" name="img_ipt" id="img_ipt" accept="image/jpg, image/jpeg" onchange="handleImageUpload()" style="display:none;"/>
         
-        <div id="image-preview">
+        <div id="image-preview" class="no-image">
             <img id="uploaded-image">
             <div id="error-message">Please select a picture.</div>
         </div>
@@ -73,40 +73,27 @@
             const file = fileInput.files[0];
 
             if (file) {
-                // Validate the file type
-                const validTypes = ['image/png', 'image/jpeg'];
+                // Check le type de fichier
+                const validTypes = ['image/jpeg', 'image/jpg'];
                 if (!validTypes.includes(file.type)) {
-                    errorMessage.textContent = 'Veuillez sélectionner une image au format PNG ou JPEG.';
-                    errorMessage.style.display = 'block';
-                    uploadedImage.style.display = 'none';
-                    chooseFileText.style.display = 'block';
-                    imagePreview.style.backgroundColor = '#ccc'; // Keep gray background when image is hidden
+                    errorMessage.textContent = 'Please select a picture. (.JPEG or .JPG)';
                     return;
                 }
                 
-                // Create a URL for the selected image and display it
+                // Affichage de l'image
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     uploadedImage.src = e.target.result;
-                    uploadedImage.style.display = 'block';
                     errorMessage.style.display = 'none';
-                    chooseFileText.style.display = 'none';
-                    imagePreview.style.backgroundColor = 'transparent'; // Remove gray background when image is displayed
-                    imagePreview.style.border = 'none'; // Remove dashed border when image is displayed
                 };
                 reader.readAsDataURL(file);
-            } else {
-                // If no file is selected, reset to initial state
-                errorMessage.textContent = 'Veuillez sélectionner une image.';
-                errorMessage.style.display = 'block';
-                uploadedImage.style.display = 'none';
-                chooseFileText.style.display = 'block';
-                imagePreview.style.backgroundColor = '#ccc'; // Show gray background
-                imagePreview.style.border = '2px dashed #5c5959'; // Keep dashed border
-            }
+                imagePreview.setAttribute('class', ''); // Suppression de la class pour l'affichage
+                const shadowStyle = 'box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);';
+                uploadedImage.style.cssText = shadowStyle;
+            } 
         }
 
-        // Add click event listener to open file dialog when the gray area is clicked
+        // Add click event listener to open file dialog when the area is clicked
         document.getElementById('image-preview').addEventListener('click', function() {
             document.getElementById('img_ipt').click();
         });

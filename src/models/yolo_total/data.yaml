@@ -1,0 +1,20 @@
+path: ../../../data/yolo_total/datasets  # dataset root directory
+train: images/train  # training images (relative to 'path')
+val: images/val  # validation images (relative to 'path')
+test:  # optional test images
+
+nc: 10 # Nombre de classe
+
+# Classes (10 classes)
+names:
+  0: Apple
+  1: Artichoke
+  2: Banana
+  3: Bell pepper
+  4: Broccoli
+  5: Carrot
+  6: Orange
+  7: Pear
+  8: Pumpkin
+  9: Strawberry
+
