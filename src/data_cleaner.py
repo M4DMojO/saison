@@ -3,8 +3,6 @@ import shutil
 import errno 
 from PIL import Image
 
-Image.MAX_IMAGE_PIXELS = None
-
 def openImage(filename):
     try:
         img = Image.open( os.path.join('data', 'yolo_total', 'datasets', 'images', 'train', filename.split(".")[0] + '.jpg' ))
@@ -87,7 +85,6 @@ def modify_txt_files(directory, fruit_to_id):
 
                     x_center = (x_br + x_tl)/2/img_w
                     y_center = (y_tl + y_br)/2/img_h
-
                     w_bb = (x_br - x_tl)/img_w
                     h_bb = (y_br - y_tl)/img_h
 
@@ -155,6 +152,7 @@ def cropper(image_path:str, save_path:str, label_path:str):
         counter = 0
         for line in labels:
             l = line.split(' ')
+            print(line)
             if len(l) == 5:
                 x_center, y_center, w, h = l[1], l[2], l[3], l[4]
             else: #Pour Bell pepper
@@ -162,18 +160,24 @@ def cropper(image_path:str, save_path:str, label_path:str):
 
             x_center, y_center, w, h = float(x_center), float(y_center), float(w), float(h)
             img_w, img_h = img.size
-            x_center = x_center * img_w
-            y_center = y_center * img_h
-            w = w * img_w
-            h = h * img_h
+            x_center = x_center
+            y_center = y_center
 
-            x1 = x_center - (w/2)
-            x2 = x_center + (w/2)
-            y1 = y_center - (h/2)
-            y2 = y_center + (h/2)
-
+            x1 = x_center - (img_w/2)
+            x2 = x_center + (img_w/2)
+            y1 = y_center - (img_h/2)
+            y2 = y_center + (img_h/2)
+            print(x_center)
+            print(img_w)
+            print("before cropping")
             img_tmp = img.crop((x1, y1, x2, y2))
-            img_tmp.save(save_path.replace(".jpg", ''.join(['_', str(counter), '.jpg'])), "jpg")
+            print("after cropping")
+            try:
+                img_tmp.save(save_path.replace(".jpg", ''.join(['_', str(counter), '.jpg'])), "JPEG")
+            except IOError as e:
+                print("Can't save")
+                print(f"Error saving image: {e}")
+            print("after saving")
 
             counter += 1
 
