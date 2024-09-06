@@ -4,6 +4,7 @@ from tensorflow.keras.utils import to_categorical
 from tensorflow.keras.applications.vgg16 import VGG16
 from tensorflow.keras.callbacks import LearningRateScheduler, ModelCheckpoint
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from tensorflow.keras.optimizers import Adam
 
 from PIL import Image
 
@@ -17,7 +18,7 @@ BATCH_SIZE = 64
 
 
 def scheduler(epoch, lr):
-    if epoch % 5:
+    if epoch % 5 and lr > 0.0001:
         return lr * 0.9
     return lr
 
@@ -100,8 +101,10 @@ def get_latest(weights_dir:str):
         raise Exception("No weights.h5")
     else:
         onlyfiles = [f for f in onlyfiles if ".weights.h5" in f]
-        nb = [f.replace("vgg16-", "").split('.')[0] for f in onlyfiles]
+        nb = [f.replace("vgg-16-", "").split('.')[0] for f in onlyfiles]
+        print(nb)
         nb = list(map(int, nb))
+        print(nb)
         #arg max
         index_max = max(enumerate(nb), key=lambda x: x[1])[0]
         return onlyfiles[index_max]
@@ -112,13 +115,16 @@ def load_model_from_weights(weights_dir:str, shape:tuple[int], from_pretrained:b
     model.load_weights(os.path.join(weights_dir, latest))
     return model
 
-
+def get_lr_from_epoch(from_epoch:int) -> float:
+    n = from_epoch % 5
+    return 0.001 * (0.9 ^ n)
 
 def fit_and_export(train_generator, validation_generator, 
                  save_path:str,
                  checkpoint_dir:str, epochs:int=20, 
                  shape:tuple[int]=VGG_IMG_SHAPE,
-                 from_pretrained:bool=False)-> Model:
+                 from_pretrained:bool=False, 
+                 from_epoch:int=0)-> Model:
     """
     Fit and export a transfer-learning model based on 
     vgg16 model for the classification task.
@@ -126,8 +132,12 @@ def fit_and_export(train_generator, validation_generator,
     """
     if from_pretrained:
         model = load_model_from_weights(checkpoint_dir, shape, from_pretrained)
+        if from_epoch == 0:
+            raise Exception("You have to set an epoch")
     else:
         model = make_vgg_architecture(shape, False)
+
+    optimizers = Adam(learning_rate=get_lr_from_epoch(from_epoch=from_epoch))
 
     model.compile(loss='categorical_crossentropy',
                         optimizer='adam',
