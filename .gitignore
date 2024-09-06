@@ -177,3 +177,6 @@ _brut/
 
 # fichier de poids 
 *.pt
+
+# fichier nohup
+nohup.out
