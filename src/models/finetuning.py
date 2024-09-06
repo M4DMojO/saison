@@ -116,7 +116,7 @@ def load_model_from_weights(weights_dir:str, shape:tuple[int], from_pretrained:b
 
 def get_lr_from_epoch(from_epoch:int) -> float:
     n = from_epoch % 5
-    return 0.001 * (0.9 ^ float(n))
+    return 0.001 * (0.9 ** float(n))
 
 def fit_and_export(train_generator, validation_generator, 
                  save_path:str,
