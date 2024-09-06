@@ -136,10 +136,10 @@ def fit_and_export(train_generator, validation_generator,
     else:
         model = make_vgg_architecture(shape, False)
 
-    optimizers = Adam(learning_rate=get_lr_from_epoch(from_epoch=from_epoch))
+    optimizer = Adam(learning_rate=get_lr_from_epoch(from_epoch=from_epoch))
 
     model.compile(loss='categorical_crossentropy',
-                        optimizer='adam',
+                        optimizer=optimizer,
                         metrics=['categorical_accuracy'])
     
     checkpoint_path = os.path.join(checkpoint_dir, 'vgg16-{epoch:04d}.weights.h5')
