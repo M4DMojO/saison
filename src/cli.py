@@ -87,4 +87,4 @@ def finetuning(type_finetuning:str='big',
     train_gen, val_gen = make_generator(train_path=train_dir, val_path=val_dir)
 
     fit_and_export(train_gen, val_gen, save_path=save_path, checkpoint_dir=chekcpoint_dir, from_pretrained=from_checkpoint,
-                   epochs=epochs, from_epoch)
+                   epochs=epochs, from_epoch=from_epoch)
