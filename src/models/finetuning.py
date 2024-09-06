@@ -101,10 +101,9 @@ def get_latest(weights_dir:str):
         raise Exception("No weights.h5")
     else:
         onlyfiles = [f for f in onlyfiles if ".weights.h5" in f]
-        nb = [f.replace("vgg-16-", "").split('.')[0] for f in onlyfiles]
-        print(nb)
+        nb = [f.replace("vgg16-", "").split('.')[0] for f in onlyfiles]
+        nb.remove("vgg16")
         nb = list(map(int, nb))
-        print(nb)
         #arg max
         index_max = max(enumerate(nb), key=lambda x: x[1])[0]
         return onlyfiles[index_max]
