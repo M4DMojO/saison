@@ -32,16 +32,23 @@ def datamaker(goal:str, vgg_only:bool=True):
 @click.option("--task", 
               "-t",
               default="vgg")
-def train_val_fol(task:str="vgg"):
+@click.option("--nb_img",
+              "-nb", 
+              default=400, 
+              type=int)
+def train_val_fol(task:str="vgg", nb_img:int=400):
     if task == "vgg":
         folder = "vgg_classification"
+        folder_data = "datasets"
     elif task == "seg":
         folder = 'yolo_segmentation'
-    root_dir = os.path.join('data', folder, 'datasets')
+        folder_data = "dataset_cropped"
+    
+    root_dir = os.path.join('data', folder, folder_data)
     train_dir = os.path.join("data", folder, 'train')
     val_dir = os.path.join("data", folder, 'val')
 
-    make_train_val_folder(root_dir, train_path=train_dir, val_path=val_dir)
+    make_train_val_folder(root_dir, train_path=train_dir, val_path=val_dir, nb_img=nb_img)
 
 
 @saison.command(name='finetuning', help='Define if we should make the "big" or "short" classification')
