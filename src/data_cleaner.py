@@ -3,6 +3,8 @@ import shutil
 import errno 
 from PIL import Image
 
+Image.MAX_IMAGE_PIXELS = None
+
 def openImage(filename):
     try:
         img = Image.open( os.path.join('data', 'yolo_total', 'datasets', 'images', 'train', filename.split(".")[0] + '.jpg' ))
@@ -145,8 +147,10 @@ def copier_et_modifier(source, destination):
 def cropper(image_path:str, save_path:str, label_path:str):
     img = Image.open(image_path)
 
-    os.makedirs(save_path, exist_ok=True)
-
+    # print(image_path)
+    # print(label_path)
+    # print(save_path)
+    # print(save_path.replace(".jpg", ''.join(['_', str(1), '.jpg'])))
     with open(label_path, 'r') as labels:
         counter = 0
         for line in labels:
@@ -156,6 +160,7 @@ def cropper(image_path:str, save_path:str, label_path:str):
             else: #Pour Bell pepper
                 x_center, y_center, w, h = l[2], l[3], l[4], l[5]
 
+            x_center, y_center, w, h = float(x_center), float(y_center), float(w), float(h)
             img_w, img_h = img.size
             x_center = x_center * img_w
             y_center = y_center * img_h
@@ -167,8 +172,8 @@ def cropper(image_path:str, save_path:str, label_path:str):
             y1 = y_center - (h/2)
             y2 = y_center + (h/2)
 
-            img_tmp = img.crop(x1, y1, x2, y2)
-            img_tmp.save(save_path.replace(".jpg", ''.join(['_', str(counter), '.jpg'])))
+            img_tmp = img.crop((x1, y1, x2, y2))
+            img_tmp.save(save_path.replace(".jpg", ''.join(['_', str(counter), '.jpg'])), "jpg")
 
             counter += 1
 
@@ -181,8 +186,6 @@ def traiter_donnees(racine, nouvelle_racine, max_elements, avec_boundingbox=Fals
             os.makedirs(nouveau_chemin_fruit, exist_ok=True)
 
             if avec_boundingbox:
-                nouveau_chemin_boundingboxes = os.path.join(nouveau_chemin_fruit, 'boundingboxes')
-                os.makedirs(nouveau_chemin_boundingboxes, exist_ok=True)
                 chemin_boundingboxes = os.path.join(chemin_fruit, 'Label')
 
             images = [f for f in os.listdir(chemin_fruit) if f.endswith('.jpg')]
@@ -216,7 +219,7 @@ def data_vgg_cls():
 
 def data_vgg_seg():
     racine = os.path.join("data", "brut_")
-    nouvelle_racine =  os.path.join("data", 'yolo_segmentation', "vgg_datasets")
+    nouvelle_racine =  os.path.join("data", 'yolo_segmentation', "dataset_cropped")
     max_elements = 400
     traiter_donnees(racine, nouvelle_racine, max_elements, avec_boundingbox=True)
 

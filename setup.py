@@ -12,7 +12,11 @@ setuptools.setup(
     version=main_ns['__version__'],
     author='la team joeffrey',
     description='for later',
+    long_description=open("README.md").read(),
+    long_description_content_type="text/markdown",
     packages=setuptools.find_packages(),
+    url="https://github.com/M4DMojO/saison",
+    python_requires="3.10.12",
     install_requires=[
         "click==8.1.3", 
         "Pillow==9.1.1"
