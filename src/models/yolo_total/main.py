@@ -3,9 +3,9 @@ import torch
 from ultralytics import YOLO
 import os
 
-
 # Chemin vers le fichier de poids
-model_path = 'yolov8n.pt'
+model_path = 'runs/detect_iter2/train12/weights/best.pt'
+
 
 # Chemin vers le fichier de données
 data_path = 'data.yaml'
@@ -14,7 +14,7 @@ data_path = 'data.yaml'
 save_dir = 'runs/detect'
 
 # Nombre d'epochs
-epochs = 100
+epochs = 400
 
 
 model = YOLO(model_path)
