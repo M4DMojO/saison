@@ -176,7 +176,8 @@ labels/
 _brut/
 
 # fichier de poids 
-*.pt
+#*.pt
 
 # fichier nohup
-nohup.out
+# nohup.out # on garde pour avoir une trace des entrainements 
+
