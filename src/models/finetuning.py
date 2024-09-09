@@ -54,13 +54,15 @@ def make_generator(train_path:str, val_path:str):
         train_path,  # this is the target directory
         target_size=VGG_SIZE,  # all images will be resized to 150x150
         batch_size=BATCH_SIZE,
-        class_mode='categorical')
+        class_mode='categorical', 
+        shuffle=True)
     
     val_generator = datagen.flow_from_directory(
         val_path,  # this is the target directory
         target_size=VGG_SIZE,  # all images will be resized to 150x150
         batch_size=BATCH_SIZE,
-        class_mode='categorical')
+        class_mode='categorical', 
+        shuffle=True)
     
     return train_generator, val_generator
 
@@ -114,7 +116,7 @@ def load_model_from_weights(weights_dir:str, shape:tuple[int], from_pretrained:b
     return model
 
 def get_lr_from_epoch(from_epoch:int) -> float:
-    n = from_epoch % 5
+    n = from_epoch // 5
     return 0.001 * (0.9 ** float(n))
 
 def fit_and_export(train_generator, validation_generator, 
@@ -148,7 +150,7 @@ def fit_and_export(train_generator, validation_generator,
                                 save_weights_only=True,
                                 save_best_only=True,
                                 verbose=1)
-    stopping = EarlyStopping(patience=20, min_delta=0.001)
+    stopping = EarlyStopping(patience=20, min_delta=0.0001)
 
     #Fit from generator
     model.fit(train_generator, 
