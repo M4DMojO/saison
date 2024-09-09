@@ -89,8 +89,12 @@ def finetuning(type_finetuning:str='big',
     train_dir = os.path.join("data", folder, 'train')
     val_dir = os.path.join("data", folder, 'val')
 
-    make_train_val_folder(root_dir, train_path=train_dir, val_path=val_dir, nb_img=images)
+    make_train_val_folder(root_dir, train_path=train_dir, 
+                          val_path=val_dir, 
+                          nb_img=images)
     train_gen, val_gen = make_generator(train_path=train_dir, val_path=val_dir)
 
-    fit_and_export(train_gen, val_gen, save_path=save_path, checkpoint_dir=chekcpoint_dir, from_pretrained=from_checkpoint,
+    fit_and_export(train_gen, val_gen, save_path=save_path, 
+                   checkpoint_dir=chekcpoint_dir, 
+                   from_pretrained=from_checkpoint,
                    epochs=epochs, from_epoch=from_epoch)
