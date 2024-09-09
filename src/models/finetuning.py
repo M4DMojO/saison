@@ -1,8 +1,7 @@
-from tensorflow.keras.layers import Dense, Flatten, Dropout, Input, Conv2D, MaxPool2D
+from tensorflow.keras.layers import Dense, Flatten, Dropout
 from tensorflow.keras.models import Model
-from tensorflow.keras.utils import to_categorical
 from tensorflow.keras.applications.vgg16 import VGG16
-from tensorflow.keras.callbacks import LearningRateScheduler, ModelCheckpoint
+from tensorflow.keras.callbacks import LearningRateScheduler, ModelCheckpoint, EarlyStopping
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.optimizers import Adam
 
@@ -147,13 +146,15 @@ def fit_and_export(train_generator, validation_generator,
     schedule = LearningRateScheduler(scheduler)
     chekpoint = ModelCheckpoint(filepath=checkpoint_path,
                                 save_weights_only=True,
+                                save_best_only=True,
                                 verbose=1)
+    stopping = EarlyStopping(patience=20, min_delta=0.001)
 
     #Fit from generator
     model.fit(train_generator, 
                 validation_data=validation_generator,
                 epochs=epochs, 
-                callbacks=[schedule, chekpoint])
+                callbacks=[schedule, chekpoint, stopping])
     #Export model
     model.export(
                 save_path, 
