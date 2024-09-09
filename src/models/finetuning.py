@@ -132,9 +132,9 @@ def make_vgg_architecture(shape:tuple[int]=VGG_IMG_SHAPE,
     """
 
     if from_pretrained:
-        weights='imagenet'
-    else:
         weights=None
+    else:
+        weights='imagenet'
 
     true_vgg = VGG16(input_shape=shape, weights=weights, 
                     include_top=False)
