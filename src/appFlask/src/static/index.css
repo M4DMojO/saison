@@ -1,6 +1,7 @@
 #image-preview {
     cursor: pointer;
     transition: all 0.3s ease;
+    height: 200px;
 }
 
 .no-image{

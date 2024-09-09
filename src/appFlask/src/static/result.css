@@ -1,4 +1,4 @@
-.saison_good{
+.saison_pos{
     color: var(--color-pos); 
 }
 
@@ -6,6 +6,23 @@
     color: var(--color-avg);
 }
 
-.saison_bad{
+.saison_neg{
     color: var(--color-neg);
+}
+
+.color-bullet{
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 8px;
+}
+
+#image-preview, #uploaded-image {
+    max-height: 200px;
+}
+
+.scan_param{
+    text-align: left;
+    display: inline;
 }
