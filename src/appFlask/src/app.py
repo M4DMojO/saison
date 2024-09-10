@@ -7,6 +7,7 @@ import shutil
 import json
 import cv2
 import custom_function as custom
+from models.model import load_models, get_results
  
 app = Flask(__name__)
 
@@ -41,6 +42,8 @@ app.config['CURRENT_MODEL_ID'] = "0" # yolo_total par défaut
 app.config['CURRENT_COUNTRY_ID'] = "season_fr" # France par défaut
 app.config['CURRENT_MONTH_ID'] = datetime.today().strftime("%m") # Mois actuel
 app.config['CURRENT_IMAGE_PATH'] = ''
+
+app.models = load_models()
 
 # Vider le dossier "uploads"
 for filename in os.listdir(app.config["UPLOAD_FOLDER"]):
@@ -113,7 +116,8 @@ def result():
     # Image d'entrée
     img = cv2.imread(app.config['CURRENT_IMAGE_PATH'])  
     # Prediction 
-    img_out = custom.draw_bounding_boxes(img, app.config)
+    results = get_results(app.models[model_id], file_path, model_id)
+    img_out = custom.draw_bounding_boxes(img, app.config, results)
     
     # Définir le chemin de sortie de l'image modifiée
     output_path = app.config['CURRENT_IMAGE_PATH'].split(".")[0] + "_out.jpg"

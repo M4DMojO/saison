@@ -151,7 +151,7 @@ def _draw_one_bounding_box(img, data):
     return img
 
 
-def draw_bounding_boxes(img, config_dict):
+def draw_bounding_boxes(img, config_dict, results):
     """
     Applique le modèle choisit par l'utilisateur, détermine la saisonnalité, et dessine des bounding boxes autour des fruits détectés.
 
@@ -162,15 +162,7 @@ def draw_bounding_boxes(img, config_dict):
     Returns:
     numpy array: Image avec les bounding boxes dessinées.
     """
-    # Chargement du modèle YOLO selon l'ID du modèle
-    if config_dict['CURRENT_MODEL_ID'] == "0":  # modèle YOLO total
-        model = YOLO('../models/yolo_total.pt')
-        predict = model(config_dict['CURRENT_IMAGE_PATH'])
-        results = _get_result_from_yolo_total(predict)
-    elif config_dict['CURRENT_MODEL_ID'] == "1":
-        pass
-    elif config_dict['CURRENT_MODEL_ID'] == "2":
-        pass
+
 
     # Parcourir les résultats de détection
     for result in results:

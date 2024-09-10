@@ -12,11 +12,30 @@ import os
 
 VGG_IMG_SHAPE = (224, 224, 3)
 
-def vgg_img_prepro(img):
+def vgg_img_prepro(img)-> np.array:
+    """
+    preprocess the image to vgg16 format
+    Args:
+        img : cv2 image | np.array
+
+    Returns:
+        np.array : image preprocessed
+    """
     img = cv2.resize(img, (VGG_IMG_SHAPE[0], VGG_IMG_SHAPE[1]))
     return np.expand_dims(img, axis=0).astype(np.float32)
 
-def make_vgg_pred(model:Model, img, shape:tuple[int]=None):
+def make_vgg_pred(model:Model, img:str, shape:tuple[int]=None) -> list[dict]:
+    """
+    Make the prediction with a given vgg16 model
+    Args:
+        model (Model): vgg16 model
+        img (str): path to image
+        shape (tuple[int], optional): shape of the image/bouding boxe
+
+    Returns:
+        list[dict]: list of outputs
+    """
+    img = cv2_img = cv2.imread(img)
     res = model.predict(vgg_img_prepro(img))
     if shape != None:
         x1, y1, x2, y2 = shape
@@ -141,3 +160,28 @@ def load_models() -> list:
     return [yolo_total,
             combined_model,
             vgg_cls]
+
+def get_results(model:Model|YOLO|YOLOToVGG, 
+                img:str, 
+                index:int) -> list[dict]:
+    """
+    Get the prediction result for a given model
+    Args:
+        model: Model
+        img (str): Path to the image to predict
+        index (int): index of the model in the Flask app cache
+
+    Raises:
+        Exception: if the index of the model is too big
+
+    Returns:
+        list[dict]: List of outputs
+    """
+    if index == 0:#yolo
+        return model(img)
+    elif index == 1: #yolo + vgg
+        return model(img)
+    elif index == 2:#vgg
+        return make_vgg_pred(model, img)
+    else:
+        raise Exception(f"No such model at index {index} error.")
