@@ -1,3 +1,13 @@
+#for models
+*.h5
+
+#data files
+data/brut_/*
+data/vgg_classification/*
+data/yolo_segmentation/*
+data/yolo_total/*
+*.zip
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -17,6 +27,7 @@ eggs/
 lib/
 lib64/
 parts/
+
 sdist/
 var/
 wheels/
