@@ -78,11 +78,13 @@ def finetuning(type_finetuning:str='big',
     if type_finetuning == 'small':
         folder = "yolo_segmentation"
         dataset = "dataset_cropped"
+        name = "vgg_classification_small.h5"
     else:
         folder = "vgg_classification"
         dataset = "datasets"
+        name = "vgg_classification_big.h5"
         
-    save_path = os.path.join("src", "models", folder , "vgg_classification.h5")
+    save_path = os.path.join("src", "models", folder , name)
     chekcpoint_dir = os.path.join("src", "models", folder, "checkpoint")
 
     root_dir = os.path.join('data', folder, dataset)
