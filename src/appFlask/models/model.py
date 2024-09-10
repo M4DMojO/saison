@@ -2,12 +2,18 @@ from tensorflow.keras.applications.vgg16 import VGG16
 from tensorflow.keras.layers import Dense, Flatten, Dropout
 from tensorflow.keras.models import Model
 from ultralytics import YOLO
+
+from custom_function import get_all_weights_from_bucket
+
 import cv2
 import numpy as np
 
 import os
 
+VGG_IMG_SHAPE = (224, 224, 3)
+
 def vgg_img_prepro(img):
+    img = cv2.resize(img, (VGG_IMG_SHAPE[0], VGG_IMG_SHAPE[1]))
     return np.expand_dims(img, axis=0).astype(np.float32)
 
 def make_vgg_pred(model:Model, img, shape:tuple[int]=None):
@@ -24,10 +30,6 @@ def make_vgg_pred(model:Model, img, shape:tuple[int]=None):
             'x1': x1, 'y1': y1,
             'x2': x2, 'y2': y2
         }
-
-class NumberModelWeightsError(Exception):
-    def __init__(self) -> None:
-        super().__init__("Not enough weight files to load the models")
 
 class YOLOToVGG():
     """
@@ -72,7 +74,6 @@ class YOLOToVGG():
         """
         return self.predict(img)
 
-VGG_IMG_SHAPE = (224, 224, 3)
 
 def make_vgg_architecture(shape:tuple[int]) -> Model:
     """
@@ -129,7 +130,7 @@ def load_models() -> list:
     """
     files = [f for f in os.listdir('../models/') if os.path.isfile(f)]
     if files < 4:
-        raise NumberModelWeightsError()
+        get_all_weights_from_bucket()
     
     yolo_total = YOLO('../models/yolo_total.pt')
     yolo_seg = YOLO('../models/yolo_segmentation.pt')
