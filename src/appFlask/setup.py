@@ -5,6 +5,7 @@ setuptools.setup(
     author='la team Avengers',
     description='for later',
     packages=setuptools.find_packages(),
+    version='1.0.0',
     install_requires=[
         "opencv-python==4.10.0.84"
         "Flask==3.0.3"
