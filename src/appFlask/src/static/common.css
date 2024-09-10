@@ -30,11 +30,6 @@
     font-family: 'Poppins', sans-serif;
 }
 
-.page_format body{
-    height: 650px;
-    width: 500px;
-}
-
 body {
     text-align: center;
     background-color: var(--color-background-dark);
@@ -95,8 +90,6 @@ h1 {
 
 #image-preview {
     display: inline-block;
-    width: 200px;
-    height: 200px;
     border-radius: 8px;
     margin-bottom: 10px;
     position: relative;

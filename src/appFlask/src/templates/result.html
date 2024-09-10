@@ -10,37 +10,36 @@
 <body>
     <div class="container">
         <h1>Seasonal Fruits <br/> and Veggies AI Calendar</h1>
-            <div id="image-preview">
-                <!-- <img name="img_out" id="uploaded-image" src="{{ output_dict.image_path }}" alt="Uploaded Image"> -->
-                <img name="img_out" id="uploaded-image" src="../static/images/0a27032c2d991a05.jpg" alt="Uploaded Image">
-            </div>
+
+        <div>
+            <table class="scan_param">
+                <tr>
+                  <td>Model:</td>
+                  <td>{{ output_dict.model_name }}</td>
+                </tr>
+                <tr>
+                  <td>Month:</td>
+                  <td>{{ output_dict.month_name }}</td>
+                </tr>
+                <tr>
+                  <td>Country:</td>
+                  <td>{{ output_dict.country_name }}</td>
+                </tr>
+              </table>    
+              
+        </div>
+
+        <div id="image-preview">
+            <img name="img_out" id="uploaded-image" src="{{ output_dict.image_path }}" alt="Uploaded Image">
+        </div>
 
 
-            <div id="result-container">
-                <!-- {% for item in output_dict.results %}
-                    <p class="saison_{{ item.class }}">
-                        This is a {{ item.fruit_name }} <br/>
-                        Seasonality : {{ item.fruit_month }}
-                    </p>
-                {% end for %} -->
-
-                <p>
-                    This is a *nom du fruit* (*x* %)<br/>
-                    Seasonality : <span class="saison_good">*range de saisonalité*</span>
-                </p>
-                <p class="saison_avg">
-                    This is a *nom du fruit* <br/>
-                    Seasonality : *range de saisonalité*
-                </p>
-                <p class="saison_bad">
-                    This is a *nom du fruit* <br/>
-                    Seasonality : *range de saisonalité*
-                </p>
-            </div>
-
+        <div>
+        </div>
+        <form action="{{ url_for('index') }}" method="get">
+            <button type="submit" id="check-button">New scan</button>
+        </form>
     </div>
-    
-    <script>
-    </script>
+
 </body>
 </html>
