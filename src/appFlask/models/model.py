@@ -7,6 +7,24 @@ import numpy as np
 
 import os
 
+def vgg_img_prepro(img):
+    return np.expand_dims(img, axis=0).astype(np.float32)
+
+def make_vgg_pred(model:Model, img, shape:tuple[int]=None):
+    res = model.predict(vgg_img_prepro(img))
+    if shape != None:
+        x1, y1, x2, y2 = shape
+    else:
+        x1, y1 = 0, 0
+        x2, y2 = img.shape
+
+    return {
+            'fruit_id': res.argmax(),
+            'confidence': np.max(res),
+            'x1': x1, 'y1': y1,
+            'x2': x2, 'y2': y2
+        }
+
 class NumberModelWeightsError(Exception):
     def __init__(self) -> None:
         super().__init__("Not enough weight files to load the models")
@@ -36,14 +54,10 @@ class YOLOToVGG():
         for box in boxes:
             x1, y1, x2, y2 = map(int, box.xyxy.cpu().numpy()[0])  # Coordonnées de la bounding box
             cropped_img = cv2_img[x1:x2, y1:y2]
-            res = self.vgg.predict(cropped_img)
-            res = np.array(res)
-            outputs.append({
-            'fruit_id': res.argmax(),
-            'confidence': np.max(res),
-            'x1': x1, 'y1': y1,
-            'x2': x2, 'y2': y2
-        })
+            res = make_vgg_pred(self.vgg, 
+                                cropped_img,
+                                (x1, y1, x2, y2))
+            outputs.append(res)
             
         return outputs
     
@@ -121,7 +135,7 @@ def load_models() -> list:
     yolo_seg = YOLO('../models/yolo_segmentation.pt')
     vgg_seg = load_vgg_from_weights('../models/vgg_classification_small.h5')
     combined_model = YOLOToVGG(yolo_seg, vgg_seg)
-    vgg_cls = load_vgg_from_weights('../models/vgg_classification_big.h5')
+    vgg_cls = load_vgg_from_weights('../models/vgg_classification_big.weights.h5')
     
     return [yolo_total,
             combined_model,
