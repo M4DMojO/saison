@@ -1,3 +1,8 @@
+.page_format body{
+    max-height: 90%;
+    max-width: 650px;
+}
+
 .saison_pos{
     color: var(--color-pos); 
 }
@@ -19,7 +24,8 @@
 }
 
 #image-preview, #uploaded-image {
-    max-height: 200px;
+    max-height: 400px;
+    max-width: 600px;
 }
 
 .scan_param{

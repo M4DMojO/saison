@@ -23,8 +23,8 @@
             <br/>
 
             <select name="model_id">
-                {% for id, model in output_dict['models'].items() %}
-                    <option value="{{ id }}" {% if id == output_dict['current_model_id'] %}selected{% endif %}>
+                {% for id, model in app_dict['MODELS'].items() %}
+                    <option value="{{ id }}" {% if id == app_dict['CURRENT_MODEL_ID'] %}selected{% endif %}>
                         {{ model }}
                     </option>
                 {% endfor %}
@@ -33,8 +33,8 @@
             <br/>
 
             <select name="month_id">
-                {% for id, month in output_dict['months'].items() %}
-                    <option value="{{ id }}" {% if id == output_dict['current_month_id'] %}selected{% endif %}>
+                {% for id, month in app_dict['MONTHS'].items() %}
+                    <option value="{{ id }}" {% if id == app_dict['CURRENT_MONTH_ID'] %}selected{% endif %}>
                         {{ month }}
                     </option>
                 {% endfor %}
@@ -43,8 +43,8 @@
             <br/>
 
             <select name="country_id">
-                {% for id, month in output_dict['countries'].items() %}
-                    <option value="{{ id }}" {% if id == output_dict['current_country_id'] %}selected{% endif %}>
+                {% for id, month in app_dict['COUNTRIES'].items() %}
+                    <option value="{{ id }}" {% if id == app_dict['CURRENT_COUNTRY_ID'] %}selected{% endif %}>
                         {{ month }}
                     </option>
                 {% endfor %}
@@ -97,17 +97,19 @@
         // Validation du formulaire avant la soumission
         function validateForm() {
             const fileInput = document.getElementById('img_ipt');
-            const file = fileInput.files[0];
-            if (!file) {
+            const uploadedImage = document.getElementById('uploaded-image');
+            
+            // Check if a file has been uploaded or if an image has been preloaded via imagePath
+            if (!fileInput.files[0] && !uploadedImage.src) {
                 alert("Please upload an image before submitting.");
-                return false;  // Empêche la soumission du formulaire
+                return false;  // Prevents form submission
             }
-            return true;  // Permet la soumission si une image est présente
+            return true;  // Allows form submission if an image is present
         }
 
         // Simulate image upload if image_path is available
         document.addEventListener('DOMContentLoaded', function() {
-            const imagePath = "{{ output_dict['image_path'] }}";
+            const imagePath = "{{ app_dict['CURRENT_IMAGE_PATH'] }}";
             if (imagePath) {
                 const imagePreview = document.getElementById('image-preview');
                 const uploadedImage = document.getElementById('uploaded-image');

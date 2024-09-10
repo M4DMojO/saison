@@ -1,10 +1,13 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request
 import os
 import logging
 from werkzeug.utils import secure_filename
 from datetime import datetime
 import shutil
-
+import json
+import cv2
+import custom_function as custom
+ 
 app = Flask(__name__)
 
 # Configuration du logger
@@ -16,26 +19,26 @@ def allowed_file(filename):
     return "." in filename and filename.rsplit(".", 1)[1].lower() in {"jpg", "jpeg"}
 
 
+# Chargement des dictionnaires à partir du fichier JSON
+with open('../data/season.json', 'r') as f:
+    data = json.load(f)
 
-# Dictionnaires
-idx_to_model = {0: "yolo_total", 1: "yolo_segmentation", 2: "vgg"} # TODO : lableliser les modèles de manière plus explicite
-idx_to_month = {"01": "January", "02": "February", "03": "March", "04": "April",
-                "05": "May", "06": "June", "07": "July", "08": "August",
-                "09": "September", "10": "October", "11": "November", "12": "December"
-}
-idx_to_country  = { 0: "France", 1: "USA"} # TODO : récupérer depuis la bdd 
-idx_to_fruit    = { 0: 'Apple', 1: 'Artichoke', 2: 'Banana',3: 'Bell pepper',4: 'Broccoli',
-                    5: 'Carrot', 6: 'Orange', 7: 'Pear', 8: 'Pumpkin',9: 'Strawberry'}
-idx_to_bdbcolor = { 0 : (255, 0, 0)} # TODO : définir les couleurs des bounding boxes pour chaque fruit
-# idx_to_season   = 
-
+app.config['FRUITS'] = {item['_id']: item['name'] for item in data['master_season']}
+app.config['MODELS'] = data['model_dict']
+app.config['MONTHS'] = data['month_dict']
+app.config['COUNTRIES'] = data['countries_dict']
+app.config['SEASONALITY_TO_COLOR'] = data['seasonality_color_dict_bgr']
+app.config['FRUIT_SEASONS'] = {
+                                item['_id']: {key: item.get(key, [])    for key in item if key.startswith('season_')}
+                                                                        for item in data['master_season']
+                            }
 
 # Configuration du dossier de sauvegarde
 app.config["UPLOAD_FOLDER"] = os.path.join("static", "uploads")
 
 # init variables 
-app.config['CURRENT_MODEL_ID'] = 0 # yolo_total par défaut
-app.config['CURRENT_COUNTRY_ID'] = 0 # France par défaut
+app.config['CURRENT_MODEL_ID'] = "0" # yolo_total par défaut
+app.config['CURRENT_COUNTRY_ID'] = "season_fr" # France par défaut
 app.config['CURRENT_MONTH_ID'] = datetime.today().strftime("%m") # Mois actuel
 app.config['CURRENT_IMAGE_PATH'] = ''
 
@@ -45,56 +48,21 @@ for filename in os.listdir(app.config["UPLOAD_FOLDER"]):
     try:
         if os.path.isfile(file_path) or os.path.islink(file_path):
             os.unlink(file_path)
-            logging.info(f"Route '/' : Fichier supprimé : {file_path}")
+            logging.info(f"Fichier supprimé : {file_path}")
         elif os.path.isdir(file_path):
             shutil.rmtree(file_path)
-            logging.info(f"Route '/'' : Dossier supprimé : {file_path}")
+            logging.info(f"Dossier supprimé : {file_path}")
     except Exception as e:
-        logging.error(f"Route '/' : Erreur lors de la suppression de {file_path}: {e}")
-
-
-
-def date_period (list_of_string) : 
-    return [int(x) for x, y in idx_to_month.items() if y in list_of_string]
-
-def number_around (integer, width) :
-    list_around = [] 
-    for i in range(1, width+1): 
-        list_around.append((integer+i)%12)
-        list_around.append((integer-i)%12)
-    print(f"list_around : {list_around}")
-    list_around_2=[12 if i == 0 else i for i in list_around]
-    return list_around_2
-        
-def enclosing_month (list_of_month, width) : 
-    enclosing=set()
-    list_of_month_number = date_period(list_of_month)
-    for month in list_of_month_number :
-        enclosing = enclosing.union(set(number_around(month, width))) 
-    return list(enclosing.difference(set(list_of_month_number)))
-        
-def month_wrong (list_of_month) : 
-    return list( set( range(13) ).difference( set( enclosing_month(list_of_month), date_period(list_of_month) ) ) )
+        logging.error(f"Erreur lors de la suppression de {file_path}: {e}")
 
 
 
 # Page d'accueil
 @app.route("/")
 def index():
-    logging.info("Route '/' : Page d'accueil.")    
+    logging.info("Accès à la page d'accueil.")    
 
-    # Formater le dictionnaire pour le template HTML
-    output_dict = {
-        "models"    : idx_to_model,
-        "months"    : idx_to_month,
-        "countries" : idx_to_country,
-        "image_path":  app.config['CURRENT_IMAGE_PATH'],
-        "current_model_id"   : app.config['CURRENT_MODEL_ID'],
-        "current_month_id"   : app.config['CURRENT_MONTH_ID'],
-        "current_country_id" : app.config['CURRENT_COUNTRY_ID']
-    }
-
-    return render_template("index.html", output_dict=output_dict)
+    return render_template("index.html", app_dict=app.config)
 
 
 
@@ -125,6 +93,7 @@ def result():
             logging.error(f"Route '/result' : Sauvegarde impossible: {e}")
 
     else:
+        file_path = app.config['CURRENT_IMAGE_PATH'] # pour le cas où on revient de result.html sans changer d'image
         logging.error("Route '/result' : Format du fichier non supporté.")
 
     # Récupérer les données du formulaire HTML
@@ -133,43 +102,34 @@ def result():
     country_id = request.form.get("country_id")
 
     # Mettre à jour les variables d"application
-    app.config['CURRENT_MODEL_ID']   = int(model_id)
+    app.config['CURRENT_MODEL_ID']   = model_id
     app.config['CURRENT_MONTH_ID']   = month_id
-    app.config['CURRENT_COUNTRY_ID'] = int(country_id)
+    app.config['CURRENT_COUNTRY_ID'] = country_id
     app.config['CURRENT_IMAGE_PATH'] = file_path
     app.config['IMAGE_PATH_OUTPUT']  = file_path 
 
+    logging.error(f"Route '/result' : model _id = {app.config['CURRENT_MODEL_ID']}.")
+
+    # Image d'entrée
+    img = cv2.imread(app.config['CURRENT_IMAGE_PATH'])  
     # Prediction 
-    # TODO : générer les résultats de la prédiction à partir des données du formulaire HTML et de l"image sauvegardée
-
-
-    # Calcul saisonnalité 
-    # TODO : algo saisonnalité
+    img_out = custom.draw_bounding_boxes(img, app.config)
     
+    # Définir le chemin de sortie de l'image modifiée
+    output_path = app.config['CURRENT_IMAGE_PATH'].split(".")[0] + "_out.jpg"
 
+    # Enregistrer l'image modifiée avec les bounding boxes
+    cv2.imwrite(output_path, img_out) 
+    
+    # Mettre à jour le chemin de sortie dans la configuration
+    app.config['IMAGE_PATH_OUTPUT'] = output_path
+  
 
-    # Formater le dictionnaire pour le template HTML
-    output_dict = { "image_path":  app.config['IMAGE_PATH_OUTPUT'],
-                    "results" : {
-                                "random_name_0": {
-                                        "seasonality": 0, # TODO : résultat du calcul de saisonnalité
-                                        "boundingbox_color": idx_to_bdbcolor[0], # TODO : remplacer 0 par l'id du label prédit
-                                        "fruit_name": idx_to_fruit[0], # TODO : remplacer 0 par l'id du label prédit
-                                        "fruit_confidence": 90, # TODO : récupérer depuis le predict
-                                        "fruit_month": "Jan., Feb." # TODO : aller chercher dans la bdd les mois de saisonnalité du fruit
-                                    },
-                                "random_name_1": {
-                                        "seasonality": 2,
-                                        "boundingbox_color": (255, 255, 0),
-                                        "fruit_name": "banana",
-                                        "fruit_confidence": 30,
-                                        "fruit_month": "Sept., Oct., Dec., Jan."
-                                    }
-                                },
-                    "model_name"   : idx_to_model[ app.config['CURRENT_MODEL_ID'] ],
-                    "month_name"   : idx_to_month[ app.config['CURRENT_MONTH_ID'] ],
-                    "country_name" : idx_to_country[ app.config['CURRENT_COUNTRY_ID'] ]
-                }
+    output_dict = { "model_name"    : app.config['MODELS'][ app.config['CURRENT_MODEL_ID'] ],
+                    "month_name"    : app.config['MONTHS'][ app.config['CURRENT_MONTH_ID'] ],
+                    "country_name"  : app.config['COUNTRIES'][ app.config['CURRENT_COUNTRY_ID'] ],
+                    "image_path"    : app.config['IMAGE_PATH_OUTPUT']
+    }
     
     return render_template("result.html", output_dict=output_dict)
 

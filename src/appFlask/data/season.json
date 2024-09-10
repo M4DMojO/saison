@@ -1,0 +1,109 @@
+{
+    "master_season": [
+        {
+            "_id": 0,
+            "name": "Apple",
+            "season_fr": ["january", "february", "march", "april", "august", "september", "october", "november", "december"],
+            "season_es": ["january", "september", "october", "november", "december"],
+            "season_de": ["august", "september", "october"]
+        },
+        {
+            "_id": 1,
+            "name": "Artichoke",
+            "season_fr": ["may", "june", "july", "august", "september"],
+            "season_es": ["january", "february", "march", "november", "december"],
+            "season_de": ["may", "june", "july", "august", "september"]
+        },
+        {
+            "_id": 2,
+            "name": "Banana",
+            "season_fr": ["january", "february", "march", "april", "may", "june", "august", "september", "october", "november", "december"],
+            "season_es": ["june", "july", "august", "september", "october"],
+            "season_de": ["may", "june", "july", "august", "september"]
+        },
+        {
+            "_id": 3,
+            "name": "Bell pepper",
+            "season_fr": ["june", "july", "august", "september", "october"],
+            "season_es": ["january", "february", "march", "april", "november", "december"],
+            "season_de": ["june", "july", "august", "september", "october"]
+        },
+        {
+            "_id": 4,
+            "name": "Broccoli",
+            "season_fr": ["september", "october", "november"],
+            "season_es": ["january", "february", "march", "april", "november", "december"],
+            "season_de": ["september", "october", "november"]
+        },
+        {
+            "_id": 5,
+            "name": "Carrot",
+            "season_fr": ["january", "february", "march", "september", "october", "november", "december"],
+            "season_es": ["january", "may", "june", "july", "august", "september", "october", "november", "december"],
+            "season_de": ["june", "july", "august", "september", "october"]
+        },
+        {
+            "_id": 6,
+            "name": "Orange",
+            "season_fr": ["january", "february", "march", "december"],
+            "season_es": ["january", "february", "march","april", "may", "november", "december"],
+            "season_de": ["june", "july", "august", "september"]
+        },
+        {
+            "_id": 7,
+            "name": "Pear",
+            "season_fr": ["january", "february", "march", "august", "september", "october", "november", "december"],
+            "season_es": ["july", "august", "september", "october", "november"],
+            "season_de": ["august", "september"],
+            "color": [128, 0, 128],
+            "model": "yolo_segmentation"
+        },
+        {
+            "_id": 8,
+            "name": "Pumpkin",
+            "season_fr": ["january", "february", "march", "september", "october", "november", "december"],
+            "season_es": ["april", "may", "june", "july", "august", "september", "october", "november"],
+            "season_de": ["august", "september", "october", "november"],
+            "color": [255, 105, 180],
+            "model": "vgg"
+        },
+        {
+            "_id": 9,
+            "name": "Strawberry",
+            "season_fr": ["may", "june", "july"],
+            "season_es": ["february", "march", "april", "may"],
+            "season_de": ["may", "june", "july"],
+            "color": [255, 20, 147],
+            "model": "yolo_total"
+        }
+    ],
+    "month_dict": {
+        "01": "january",
+        "02": "february",
+        "03": "march",
+        "04": "april",
+        "05": "may",
+        "06": "june",
+        "07": "july",
+        "08": "august",
+        "09": "september",
+        "10": "october",
+        "11": "november",
+        "12": "december"
+    },
+    "model_dict": {
+        "0": "yolo_total",
+        "1": "yolo_segmentation",
+        "2": "vgg"
+    },
+    "countries_dict": {
+        "season_fr": "France",
+        "season_es": "Spain",
+        "season_de": "Germany"
+    },
+    "seasonality_color_dict_bgr": {
+        "0": [0, 0, 255],
+        "1": [0, 165, 255],
+        "2": [0, 255, 0]
+    }
+}

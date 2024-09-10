@@ -27,18 +27,6 @@
                 </tr>
               </table>    
               
-              <!-- <table class="scan_param">
-                    <tr>
-                        <td>Model</td>
-                        <td>Month</td>
-                        <td>Country</td>
-                    </tr>
-                    <tr>
-                        <td>{{ output_dict.model_name }}</td>
-                        <td>{{ output_dict.month_name }}</td>
-                        <td>{{ output_dict.country_name }}</td>
-                    
-              </table> -->
         </div>
 
         <div id="image-preview">
@@ -47,19 +35,6 @@
 
 
         <div>
-            {% for item in output_dict.results.values() %}
-                <p class="saison_{{ 'pos' if item.seasonality == 2 else 'avg' if item.seasonality == 1 else 'neg' }}">
-                    <span class="color-bullet" style="background-color: rgb{{ item.boundingbox_color }};"></span>
-                    {% if item.fruit_name[0] in 'AEIOUaeiou' %} 
-                        This is an {{ item.fruit_name }} 
-                    {% else %}
-                        This is a {{ item.fruit_name }}
-                    {% endif %}
-                    ({{ item.fruit_confidence}} %)
-                    <br/>
-                    Seasonality : {{ item.fruit_month }}
-                </p>
-            {% endfor %}
         </div>
         <form action="{{ url_for('index') }}" method="get">
             <button type="submit" id="check-button">New scan</button>
