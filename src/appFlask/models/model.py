@@ -134,7 +134,7 @@ def load_vgg_from_weights(weight_path:str)-> Model:
         Model: Model with custom vgg16 architecture and weights
     """
     model = make_vgg_architecture(VGG_IMG_SHAPE)
-    model.load_weights(weight_path)
+    model.load_weights("src/appFlask/models/vgg_classification_big.weights.h5")
     return model
 
 def remake_vgg():
@@ -158,6 +158,8 @@ def load_models() -> list:
     if len(files) < 4:
         get_all_weights_from_bucket()
         print("load from bucket done")
+    
+
     yolo_total = YOLO(os.path.join(base_path, "yolo_total.pt"))
     #yolo_seg = YOLO(os.path.join(base_path, 'yolo_segmentation.pt'))
     #vgg_seg = load_vgg_from_weights(os.path.join(base_path, 'vgg_classification_small.h5'))
