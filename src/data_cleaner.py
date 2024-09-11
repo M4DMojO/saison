@@ -233,6 +233,9 @@ def data_total():
                 'val': []
             }
         }
+    source_folder = os.path.join('data', 'brut_')
+    fruit_list = sorted(os.listdir(source_folder))
+    fruit_to_idx = {fruit : i for i, fruit in enumerate(fruit_list)}
 
     # Remplissage du dictionnaire de données
     for fruit in fruit_list:
@@ -270,7 +273,7 @@ def data_total():
         copy_files(dataset['images'][split], dataset_path, os.path.join('images', split))
         copy_files(dataset['labels'][split], dataset_path, os.path.join('labels', split))
 
-        source_folder = os.path.join('..', 'data', 'brut_')
+        source_folder = os.path.join('data', 'brut_')
         fruit_list = sorted(os.listdir(source_folder))
         fruit_to_idx = {fruit : i for i, fruit in enumerate(fruit_list)}
         modify_txt_files(os.path.join("data", "yolo_total", "datasets","labels", "train"), 
