@@ -233,6 +233,9 @@ def data_total():
                 'val': []
             }
         }
+    source_folder = os.path.join('..', 'data', '_brut')
+    fruit_list = sorted(os.listdir(source_folder))
+    fruit_to_idx = {fruit : i for i, fruit in enumerate(fruit_list)}
 
     # Remplissage du dictionnaire de données
     for fruit in fruit_list:
