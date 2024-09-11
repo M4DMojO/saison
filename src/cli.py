@@ -2,7 +2,7 @@ import click
 import os
 from src.models.finetuning import make_train_val_folder, make_generator, fit_and_export
 from src.data_cleaner import data_vgg_cls, data_seg, data_total, data_vgg_seg
-from src.appFlask.models.model import load_models
+from src.appFlask.models import model
 from google.cloud import storage
 
 def upload_blob(bucket_name, source_file_name, destination_blob_name):
@@ -155,4 +155,4 @@ def upload(weights:str, model:str="all"):
     
 @saison.command(name="load_models", help="Load models from bucket")
 def load_models():
-    load_models()
+    model.load_models()
