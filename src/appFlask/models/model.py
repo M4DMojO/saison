@@ -155,6 +155,8 @@ def load_models() -> list:
     base_path = "src/appFlask/models"
     files = [f for f in os.listdir('src/appFlask/models/') if os.path.isfile(f) and ("h5" in f or "pt" in f)]
     if len(files) < 4:
+        print("--"*10)
+        print("loading files from bucket")
         get_all_weights_from_bucket()
         print("load from bucket done")
     
@@ -163,7 +165,7 @@ def load_models() -> list:
     #yolo_seg = YOLO(os.path.join(base_path, 'yolo_segmentation.pt'))
     #vgg_seg = load_vgg_from_weights(os.path.join(base_path, 'vgg_classification_small.h5'))
     #combined_model = YOLOToVGG(yolo_seg, vgg_seg)
-    vgg_cls = load_vgg_from_weights(os.path.join(base_path, 'vgg_classification_big.keras'))
+    vgg_cls = load_vgg_from_weights(os.path.join(base_path, 'vgg_classification_big.h5'))
     
     return [yolo_total,
             #combined_model,
