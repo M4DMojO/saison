@@ -233,7 +233,7 @@ def data_total():
                 'val': []
             }
         }
-    source_folder = os.path.join('data', '_brut')
+    source_folder = os.path.join('data', 'brut_')
     fruit_list = sorted(os.listdir(source_folder))
     fruit_to_idx = {fruit : i for i, fruit in enumerate(fruit_list)}
 
