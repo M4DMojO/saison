@@ -47,7 +47,7 @@ def make_train_val_folder(root:str, train_path:str, val_path:str,
     val_path : str
         The path to the futur validation folder
     nb_img : int, optional
-        The max image per class. Default is 400
+        The max image per class. Default is 400. -1 for all images
     val_split : float, optional
         Between 0 and 1. The ratio of total images to val. 
     """
@@ -60,6 +60,8 @@ def make_train_val_folder(root:str, train_path:str, val_path:str,
         os.makedirs(val_dir, exist_ok=True)
 
         images = [f for f in os.listdir(root_dir) if f.endswith('.jpg')]
+        if nb_img == -1:
+            nb_img = len(images)
         for i in range(len(images)):
             source = os.path.join(root_dir, images[i])
             if i < int(nb_img * (1 - val_split)):
