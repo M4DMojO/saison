@@ -49,7 +49,7 @@ se placer dans le dossier data saison/data/yolo_total
 En local : 
 
 créer l'image : `docker buildx build . -t flask_app_saison`
-lancer le docker : `docker run -p 5000:5000 flask_app_saison`
+lancer le docker : `docker run -p 5000:5000 --name container_saison flask_app_saison`
 
 L'appli est dispo en local http://localhost:5000
 
