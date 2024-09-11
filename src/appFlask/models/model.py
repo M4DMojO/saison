@@ -147,8 +147,8 @@ def load_models() -> list:
     Returns:
         list: List of models
     """
-    files = [f for f in os.listdir('../models/') if os.path.isfile(f)]
-    if files < 4:
+    files = [f for f in os.listdir('src/appFlask/models/') if os.path.isfile(f)]
+    if files < 5:
         get_all_weights_from_bucket()
     
     yolo_total = YOLO('../models/yolo_total.pt')
