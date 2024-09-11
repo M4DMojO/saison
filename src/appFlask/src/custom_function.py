@@ -24,18 +24,19 @@ def get_weights_from_bucket(model:str):
     """
     storage_client = storage.Client().from_service_account_json('.credentials/keys.json')
     bucket = storage_client.bucket('all-weights')
+    base_path = join("src", "appFlask", "models")
     if model == "cls" or model == "total":
         if model == "cls":
             name = "vgg_classification_big.weights.h5"
         else:
             name = "yolo_total.pt"
         blob = bucket.blob(name)
-        destination_file_name = join("..", "models", name)
+        destination_file_name = join(base_path, "models", name)
         blob.download_to_filename(destination_file_name)
     elif model == "seg":
         for name in ["vgg_classification_small.h5", "yolo_segmentation.pt"]:
             blob = bucket.blob(name)
-            destination_file_name = join("..", "models", name)
+            destination_file_name = join(base_path, "models", name)
             blob.download_to_filename(destination_file_name)
     else:
         raise Exception("No such argument, use : cls|total|seg")
