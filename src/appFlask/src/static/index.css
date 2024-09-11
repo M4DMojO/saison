@@ -1,13 +1,13 @@
 .page_format body{
-    height: 650px;
+    height: 600px;
     width: 500px;
 }
 
 #image-preview {
     cursor: pointer;
     transition: all 0.3s ease;
-    height: 200px;
-    width: 400px;
+    height: 250px;
+    width: 500px;
 }
 
 .no-image{
