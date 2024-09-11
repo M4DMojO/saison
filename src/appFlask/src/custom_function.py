@@ -7,11 +7,21 @@ from google.cloud import storage
 
 
 def get_all_weights_from_bucket():
+    """
+    Load the wieghts of all the models : cls, seg and total
+    """
     for model in ["cls", 'total']:
         get_weights_from_bucket(model)
 
 def get_weights_from_bucket(model:str):
+    """
+    Load the weights of a given model
+    Args:
+        model (str): the model to laod : cls|total|seg
 
+    Raises:
+        Exception: raise when not the correct arg is unrecognized
+    """
     storage_client = storage.Client().from_service_account_json('.credentials/keys.json')
     bucket = storage_client.bucket('all-weights')
     if model == "cls" or model == "total":
