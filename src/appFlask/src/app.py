@@ -36,6 +36,9 @@ app.config['FRUIT_SEASONS'] = {
 # Configuration du dossier de sauvegarde
 app.config["UPLOAD_FOLDER"] = os.path.join("static", "uploads")
 
+# Confidence mini pour les détections
+app.config['MINIMUM_CONFIDENCE'] = 0.5
+
 # init variables 
 app.config['CURRENT_MODEL_ID'] = "0" # yolo_total par défaut
 app.config['CURRENT_COUNTRY_ID'] = "season_fr" # France par défaut
