@@ -157,7 +157,7 @@ def load_models() -> list:
     files = [f for f in os.listdir('src/appFlask/models/') if os.path.isfile(f) and ("h5" in f or "pt" in f)]
     if len(files) < 4:
         get_all_weights_from_bucket()
-    
+        print("load from bucket done")
     yolo_total = YOLO(os.path.join(base_path, "yolo_total.pt"))
     #yolo_seg = YOLO(os.path.join(base_path, 'yolo_segmentation.pt'))
     #vgg_seg = load_vgg_from_weights(os.path.join(base_path, 'vgg_classification_small.h5'))
