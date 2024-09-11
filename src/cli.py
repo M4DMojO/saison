@@ -24,7 +24,7 @@ def upload_blob(bucket_name, source_file_name, destination_blob_name):
         f"File {source_file_name} uploaded to {destination_blob_name}."
     )
 
-@click.group(name='"saison')
+@click.group(name='saison')
 def saison():
     pass
 
@@ -153,14 +153,12 @@ def upload(weights:str, model:str="all"):
                 source_file_name=source, 
                 destination_blob_name=dest)
     
-@click.group(name="appflask")
-def appflask():
     pass
 
-@appflask.command(name="load_models", help="Load models from bucket")
+@saison.command(name="load_models", help="Load models from bucket")
 def load_models():
     model.load_models()
 
-@appflask.command(name="remake the vgg big from weights.h5 to .h5")
+@saison.command(name="remake the vgg big from weights.h5 to .h5")
 def remake():
     model.remake_vgg()
