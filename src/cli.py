@@ -13,6 +13,7 @@ def upload_blob(bucket_name, source_file_name, destination_blob_name):
     # source_file_name = "local/path/to/file"
     # The ID of your GCS object
     # destination_blob_name = "storage-object-name"
+    
     storage_client = storage.Client().from_service_account_json('.credentials/keys.json')
     bucket = storage_client.bucket(bucket_name)
     blob = bucket.blob(destination_blob_name)
@@ -122,14 +123,32 @@ def finetuning(type_finetuning:str='big',
     
 @saison.command("upload", help='upload a file to bucket')
 @click.option("--weights", 
-              "-w")
-def upload(weights:str):
+              "-w",
+              type=str)
+@click.option("--model", 
+              "-m", 
+              default="all", 
+              type=str)
+def upload(weights:str, model:str="all"):
+    base_path = os.path.join("src", "models")
     if weights == "cls":
-        source = os.path.join("src", "models", "vgg_classification", "big", "checkpoint"," vgg16-0031.weights.h5")
+        source = os.path.join(base_path, "vgg_classification", "big", "checkpoint"," vgg16-0031.weights.h5")
         dest = "vgg_classification.weights.h5"
+
     elif weights == "seg":
-         source = os.path.join("src", "models", "yolo_segmentation", "model")
-         dest = "vgg_segmentation.weights.h5"
+        base_path = os.path.join(base_path, "yolo_segmentation")
+        if model == "vgg":
+            source = os.path.join(base_path, "model")
+            dest = "vgg_segmentation.weights.h5"
+        elif model == "all":
+            pass
+        elif model == "yolo":
+            source = os.path.join(base_path, "runs", "detect_iter1", "weights", "best.pt")
+            dest = "yolo_segmentation.pt"
+
+    elif weights == "total":
+        source = os.path.join(base_path, "yolo_total", "runs", "detect_iter3", "weights", "best.pt")
+        dest = "yolo_total.pt"
     upload_blob("all-weights", 
                 source_file_name=source, 
                 destination_blob_name=dest)
