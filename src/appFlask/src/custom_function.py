@@ -27,14 +27,14 @@ def get_weights_from_bucket(model:str):
     base_path = join("src", "appFlask", "models")
     if model == "cls" or model == "total":
         if model == "cls":
-            name = "vgg_classification_big.h5"
+            name = "vgg_classification_big.keras"
         else:
             name = "yolo_total.pt"
         blob = bucket.blob(name)
         destination_file_name = join(base_path, name)
         blob.download_to_filename(destination_file_name)
     elif model == "seg":
-        for name in ["vgg_classification_small.h5", "yolo_segmentation.pt"]:
+        for name in ["vgg_classification_small.keras", "yolo_segmentation.pt"]:
             blob = bucket.blob(name)
             destination_file_name = join(base_path, name)
             blob.download_to_filename(destination_file_name)
