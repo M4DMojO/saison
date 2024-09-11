@@ -147,18 +147,19 @@ def load_models() -> list:
     Returns:
         list: List of models
     """
+    base_path = "src/appFlask/models"
     files = [f for f in os.listdir('src/appFlask/models/') if os.path.isfile(f)]
     if len(files) < 5:
         get_all_weights_from_bucket()
     
-    yolo_total = YOLO('../models/yolo_total.pt')
-    yolo_seg = YOLO('../models/yolo_segmentation.pt')
-    vgg_seg = load_vgg_from_weights('../models/vgg_classification_small.h5')
-    combined_model = YOLOToVGG(yolo_seg, vgg_seg)
-    vgg_cls = load_vgg_from_weights('../models/vgg_classification_big.weights.h5')
+    yolo_total = YOLO(os.path.join(base_path, "yolo_total.pt"))
+    #yolo_seg = YOLO(os.path.join(base_path, 'yolo_segmentation.pt'))
+    #vgg_seg = load_vgg_from_weights(os.path.join(base_path, 'vgg_classification_small.h5'))
+    #combined_model = YOLOToVGG(yolo_seg, vgg_seg)
+    vgg_cls = load_vgg_from_weights(os.path.join(base_path, 'vgg_classification_big.weights.h5'))
     
     return [yolo_total,
-            combined_model,
+            #combined_model,
             vgg_cls]
 
 def get_results(model:Model|YOLO|YOLOToVGG, 
