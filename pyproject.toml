@@ -9,7 +9,7 @@ description = "Project to detect fruits and vegetables and to indicate if they a
 readme = {file = "README.md", content-type = "text/markdown"}
 requires-python = ">=3.10"
 authors = [
-    { name = "Joeffrey Elis", email = "google@jomojo.net" },
+    { name = "Joffrey Elis", email = "google@jomojo.net" },
     { name = "Luc Beltran", email = "beltranluc0@gmail.com" },
     { name = "Jean Philippe Meline", email = "jeanphilippe.meline@gmail.com" },
     { name = "Eric Hu", email = "hueric1997@gmail.com" }
