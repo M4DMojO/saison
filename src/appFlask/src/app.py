@@ -134,4 +134,6 @@ def result():
     return render_template("result.html", output_dict=output_dict)
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 8080)), debug=True)
+    # port 8080 pour google cloud run
+# 

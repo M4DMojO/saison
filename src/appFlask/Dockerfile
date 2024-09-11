@@ -1,25 +1,46 @@
-# Use an official Python runtime as a parent image
+# Utiliser une image Python officielle comme base
 FROM python:3.10.12-slim
 
-# Set the working directory to /app
-# WORKDIR /src/appFlask
+# Définir le répertoire de travail sur /app
+WORKDIR /app
 
-# Copy the current directory contents into the container at /app
-COPY src /app
-COPY setup.py setup.py
-COPY requirements.txt requirements.txt
+# Mettre à jour le gestionnaire de paquets et installer les dépendances système
+RUN apt-get update && apt-get install -y \
+    libgl1-mesa-glx \
+    libglib2.0-0 \
+    gstreamer1.0-libav \
+    gstreamer1.0-plugins-base \
+    gstreamer1.0-plugins-good \
+    gstreamer1.0-plugins-bad \
+    gstreamer1.0-plugins-ugly \
+    gstreamer1.0-tools \
+    build-essential \
+    python3-dev \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Install any needed packages specified in requirements.txt
-RUN pip install --upgrade pip
-#RUN pip install -r requirements.txt
-RUN pip install --no-cache-dir .
+# Copier les fichiers requirements.txt dans le conteneur
+COPY requirements.txt .
 
-# Make port 5000 available to the world outside this container
-EXPOSE 5001
+# Installer les paquets Python nécessaires
+RUN python -m pip install --upgrade pip setuptools wheel && \
+    pip install -r requirements.txt
 
-# Define environment variable
-#
+# Copier le code source de l'application dans le conteneur
+COPY src /app/src
 
-# Run app.py when the container launches
-ENTRYPOINT ["python3", "/app/app.py"]
-CMD ["echo", "Hello"]
+# Copier les fichiers de données nécessaires
+COPY data /app/data
+
+# Copier les fichiers de modèles nécessaires
+COPY models /app/models
+
+# Exposer le port 5000 au monde extérieur
+EXPOSE 5000
+
+WORKDIR /app/src 
+
+# Définir la variable d'environnement pour Flask
+ENV FLASK_APP=app.py
+
+# Commande d'entrée pour lancer l'application Flask
+ENTRYPOINT ["python3", "app.py"]
