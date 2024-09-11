@@ -27,7 +27,7 @@ def get_weights_from_bucket(model:str):
     base_path = join("src", "appFlask", "models")
     if model == "cls" or model == "total":
         if model == "cls":
-            name = "vgg_classification_big.weights.h5"
+            name = "vgg_classification_big.keras"
         else:
             name = "yolo_total.pt"
         blob = bucket.blob(name)

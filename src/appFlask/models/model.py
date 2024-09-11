@@ -1,6 +1,6 @@
 from tensorflow.keras.applications.vgg16 import VGG16
 from tensorflow.keras.layers import Dense, Flatten, Dropout
-from tensorflow.keras.models import Model
+from tensorflow.keras.models import Model, load_model
 from ultralytics import YOLO
 
 from src.appFlask.src.custom_function import get_all_weights_from_bucket
@@ -133,9 +133,8 @@ def load_vgg_from_weights(weight_path:str)-> Model:
     Returns:
         Model: Model with custom vgg16 architecture and weights
     """
-    model = make_vgg_architecture(VGG_IMG_SHAPE)
-    model.load_weights("src/appFlask/models/vgg_classification_big.weights.h5")
-    return model
+    
+    return load_model(weight_path)
 
 def remake_vgg():
     base_path = os.path.join("src", "appFlask", "models")
