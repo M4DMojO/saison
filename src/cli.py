@@ -143,11 +143,11 @@ def upload(weights:str, model:str="all"):
         elif model == "all":
             pass
         elif model == "yolo":
-            source = os.path.join(base_path, "runs", "detect_iter1", "weights", "train", "best.pt")
+            source = os.path.join(base_path, "runs", "detect_iter1", "train", "weights", "best.pt")
             dest = "yolo_segmentation.pt"
 
     elif weights == "total":
-        source = os.path.join(base_path, "yolo_total", "runs", "detect_iter3", "weights", "train", "best.pt")
+        source = os.path.join(base_path, "yolo_total", "runs", "detect_iter3", "train", "weights", "best.pt")
         dest = "yolo_total.pt"
     upload_blob("all-weights", 
                 source_file_name=source, 
