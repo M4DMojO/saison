@@ -12,11 +12,6 @@
     --color-background-button-active: #689F38;
     --color-select: #DFF2BF; 
     --color-select-hover: #A5D6A7;
-
-    /* Couleurs pour différents états */
-    --color-pos: #4CAF50; 
-    --color-avg: #FFC107; 
-    --color-neg: #F44336; 
 }
 
 .page_format {
@@ -30,14 +25,40 @@
     font-family: 'Poppins', sans-serif;
 }
 
+
 body {
     text-align: center;
     background-color: var(--color-background-dark);
     padding: 20px;
     border-radius: 12px; 
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
-    height:100%;
-    width: 100%;
+    max-height: 90%;
+    max-width: 850px;
+    color: var(--color-text);
+}
+
+.home-button {
+    position: relative;
+    width: 30px;
+    height: 30px;
+    background-color: var(--color-background-button);
+    border: none;
+    border-radius: 50%;
+    color: #fff;
+    font-size: 18px; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.home-button:hover {
+    background-color: var(--color-background-button-hover);
+}
+
+.home-button:active {
+    background-color: var(--color-background-button-active);
 }
 
 select,
@@ -53,7 +74,6 @@ button {
 
 select {
     background-color: var(--color-select);
-    color: var(--color-text);
     cursor: pointer;
 }
 
@@ -87,6 +107,10 @@ h1 {
     margin-bottom: 20px;
 }
 
+h1 span {
+    color: var(--color-accent);
+}
+
 
 #image-preview {
     display: inline-block;
@@ -103,4 +127,15 @@ h1 {
 #uploaded-image {
     max-width: 100%;
     max-height: 100%;
+}
+
+.image-container {
+    height: 550px;  /* Hauteur maximale du conteneur */
+    width: 800px;   /* Largeur maximale du conteneur */
+}
+
+#uploaded-image {
+    max-height: 100%;
+    max-width: 100%;
+    object-fit: contain; /* Garde les proportions de l'image */
 }
