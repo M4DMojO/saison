@@ -96,3 +96,7 @@ Cela lancera l'entraînement avec les options par défaut.
 ```bash
 gcloud compute scp --recurse /path/to/folder/or/file user@vm:~/new/path/to/folder/or/file
 ```
+
+## transférer un fichier vers un bucket 
+`gsutil cp models/yolo_total/runs/detect/train7/weights/best.pt gs://yolo_total_weights/iter1.pt`
+

@@ -1,0 +1,106 @@
+/* Palette de couleurs */
+:root {
+    --color-background-light: #ffffff;
+    --color-background-dark: #f5f5f5;
+    --color-border: #03A9F4;
+    --color-border-hover: #0288D1;
+    --color-text: #616161;
+    --color-primary: #8BC34A;
+    --color-accent: #df8602;
+    --color-background-button: #8BC34A;
+    --color-background-button-hover: #7CB342;
+    --color-background-button-active: #689F38;
+    --color-select: #DFF2BF; 
+    --color-select-hover: #A5D6A7;
+
+    /* Couleurs pour différents états */
+    --color-pos: #4CAF50; 
+    --color-avg: #FFC107; 
+    --color-neg: #F44336; 
+}
+
+.page_format {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+    background-color: var(--color-background-light); 
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    text-align: center;
+    background-color: var(--color-background-dark);
+    padding: 20px;
+    border-radius: 12px; 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+    height:100%;
+    width: 100%;
+}
+
+select,
+button {
+    width: 200px;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 10px;
+    transition: all 0.3s ease;
+}
+
+select {
+    background-color: var(--color-select);
+    color: var(--color-text);
+    cursor: pointer;
+}
+
+select:hover{
+    transform: scale(1.2);
+    background-color: var(--color-select-hover);
+}
+
+button {
+    background-color: var(--color-primary);
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 16px;
+    
+}
+
+button:hover {
+    background-color: var(--color-primary);
+    transform: scale(1.2); 
+}
+
+button:active {
+    background-color: var(--color-background-button-active);
+    transform: scale(0.8); 
+}
+
+h1 {
+    font-size: 32px;
+    color: var(--color-primary);
+    margin-bottom: 20px;
+}
+
+
+#image-preview {
+    display: inline-block;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    position: relative;
+}
+
+#image-preview:hover {
+    border-color: var(--color-border-hover);
+    background-color: var(--color-background-dark); /* Changement de fond au survol */
+}
+
+#uploaded-image {
+    max-width: 100%;
+    max-height: 100%;
+}
