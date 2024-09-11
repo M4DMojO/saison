@@ -26,7 +26,7 @@ def get_weights_from_bucket(model:str):
     bucket = storage_client.bucket('all-weights')
     if model == "cls" or model == "total":
         if model == "cls":
-            name = "vgg_classification_big.h5"
+            name = "vgg_classification_big.weights.h5"
         else:
             name = "yolo_total.pt"
         blob = bucket.blob(name)

@@ -137,6 +137,12 @@ def load_vgg_from_weights(weight_path:str)-> Model:
     model.load_weights(weight_path)
     return model
 
+def remake_vgg():
+    base_path = os.path.join("src", "appFlask", "models")
+    model = make_vgg_architecture(VGG_IMG_SHAPE)
+    model.load_weights(os.path.join(base_path, "vgg_classification_big.weights.h5"))
+    model.save(os.path.join(base_path, "vgg_classification_big.h5"))
+
 def load_models() -> list:
     """Loads and returns the model used for the app
 
@@ -148,8 +154,8 @@ def load_models() -> list:
         list: List of models
     """
     base_path = "src/appFlask/models"
-    files = [f for f in os.listdir('src/appFlask/models/') if os.path.isfile(f)]
-    if len(files) < 5:
+    files = [f for f in os.listdir('src/appFlask/models/') if os.path.isfile(f) and ("h5" in f or "pt" in f)]
+    if len(files) < 4:
         get_all_weights_from_bucket()
     
     yolo_total = YOLO(os.path.join(base_path, "yolo_total.pt"))

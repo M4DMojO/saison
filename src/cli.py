@@ -153,6 +153,14 @@ def upload(weights:str, model:str="all"):
                 source_file_name=source, 
                 destination_blob_name=dest)
     
-@saison.command(name="load_models", help="Load models from bucket")
+@click.group(name="appFlask")
+def appFlask():
+    pass
+
+@appFlask.command(name="load_models", help="Load models from bucket")
 def load_models():
     model.load_models()
+
+@appFlask.command(name="remake the vgg big from weights.h5 to .h5")
+def remake():
+    model.remake_vgg()
