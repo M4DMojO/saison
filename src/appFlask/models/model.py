@@ -3,7 +3,7 @@ from tensorflow.keras.layers import Dense, Flatten, Dropout
 from tensorflow.keras.models import Model
 from ultralytics import YOLO
 
-from custom_function import get_all_weights_from_bucket
+from src.custom_function import get_all_weights_from_bucket
 
 import cv2
 import numpy as np

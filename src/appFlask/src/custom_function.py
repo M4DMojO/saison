@@ -7,7 +7,7 @@ from google.cloud import storage
 
 
 def get_all_weights_from_bucket():
-    for model in ["cls", "seg", 'total']:
+    for model in ["cls", 'total']:
         get_weights_from_bucket(model)
 
 def get_weights_from_bucket(model:str):
