@@ -1,8 +1,48 @@
 import cv2
+
+from os.path import join
+
 from ultralytics import YOLO
+from google.cloud import storage
 import unicodedata
 from werkzeug.utils import secure_filename
 import os
+
+
+def get_all_weights_from_bucket():
+    """
+    Load the wieghts of all the models : cls, seg and total
+    """
+    for model in ["cls", "seg", 'total']:
+        get_weights_from_bucket(model)
+
+def get_weights_from_bucket(model:str):
+    """
+    Load the weights of a given model
+    Args:
+        model (str): the model to laod : cls|total|seg
+
+    Raises:
+        Exception: raise when not the correct arg is unrecognized
+    """
+    storage_client = storage.Client().from_service_account_json('.credentials/keys.json')
+    bucket = storage_client.bucket('all-weights')
+    base_path = join("src", "appFlask", "models")
+    if model == "cls" or model == "total":
+        if model == "cls":
+            name = "vgg_classification_big.keras"
+        else:
+            name = "yolo_total.pt"
+        blob = bucket.blob(name)
+        destination_file_name = join(base_path, name)
+        blob.download_to_filename(destination_file_name)
+    elif model == "seg":
+        for name in ["vgg_classification_small.keras", "yolo_segmentation.pt"]:
+            blob = bucket.blob(name)
+            destination_file_name = join(base_path, name)
+            blob.download_to_filename(destination_file_name)
+    else:
+        raise Exception("No such argument, use : cls|total|seg")
 
 
 def _get_result_from_yolo_total(results):
@@ -125,7 +165,7 @@ def _draw_one_bounding_box(img, data):
     return img
 
 
-def draw_bounding_boxes(img, config_dict):
+def draw_bounding_boxes(img, config_dict, results):
     """
     Applique le modèle choisit par l'utilisateur, détermine la saisonnalité, et dessine des bounding boxes autour des fruits détectés.
 
@@ -136,16 +176,6 @@ def draw_bounding_boxes(img, config_dict):
     Returns:
     numpy array: Image avec les bounding boxes dessinées.
     """
-
-    # Chargement du modèle YOLO selon l'ID du modèle
-    if config_dict['CURRENT_MODEL_ID'] == "0":  # modèle YOLO total
-        model = YOLO('../models/yolo_total.pt')
-        predict = model(config_dict['IMG_SRC_PATH'])
-        results = _get_result_from_yolo_total(predict)
-    elif config_dict['CURRENT_MODEL_ID'] == "1":
-        pass
-    elif config_dict['CURRENT_MODEL_ID'] == "2":
-        pass
 
     # Parcourir les résultats de détection
     for result in results:

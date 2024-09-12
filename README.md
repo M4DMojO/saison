@@ -47,7 +47,7 @@ sudo apt-get update
 Pour télécharger les autres librairies, il faut d'abord créer un environnement virtuel.
 ```bash
 sudo apt-get update
-pip install venv
+sudo apt-get install python3.10-venv
 python -m venv /path/to/new/virtual/environment
 ```
 Puis se placer dedans:

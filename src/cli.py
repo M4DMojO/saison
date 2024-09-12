@@ -2,7 +2,7 @@ import click
 import os
 from src.models.finetuning import make_train_val_folder, make_generator, fit_and_export
 from src.data_cleaner import data_vgg_cls, data_seg, data_total, data_vgg_seg
-
+from src.appFlask.models import model
 from google.cloud import storage
 
 def upload_blob(bucket_name, source_file_name, destination_blob_name):
@@ -13,6 +13,7 @@ def upload_blob(bucket_name, source_file_name, destination_blob_name):
     # source_file_name = "local/path/to/file"
     # The ID of your GCS object
     # destination_blob_name = "storage-object-name"
+    
     storage_client = storage.Client().from_service_account_json('.credentials/keys.json')
     bucket = storage_client.bucket(bucket_name)
     blob = bucket.blob(destination_blob_name)
@@ -23,7 +24,7 @@ def upload_blob(bucket_name, source_file_name, destination_blob_name):
         f"File {source_file_name} uploaded to {destination_blob_name}."
     )
 
-@click.group(name='"saison')
+@click.group(name='saison')
 def saison():
     pass
 
@@ -97,11 +98,13 @@ def finetuning(type_finetuning:str='big',
     if type_finetuning == 'small':
         folder = "yolo_segmentation"
         dataset = "dataset_cropped"
+        name = "vgg_classification_small.h5"
     else:
         folder = "vgg_classification"
         dataset = "datasets"
+        name = "vgg_classification_big.h5"
         
-    save_path = os.path.join("src", "models", folder , "vgg_classification.h5")
+    save_path = os.path.join("src", "models", folder , name)
     chekcpoint_dir = os.path.join("src", "models", folder, "checkpoint")
 
     root_dir = os.path.join('data', folder, dataset)
@@ -120,14 +123,36 @@ def finetuning(type_finetuning:str='big',
     
 @saison.command("upload", help='upload a file to bucket')
 @click.option("--weights", 
-              "-w")
-def upload(weights:str):
+              "-w",
+              type=str)
+@click.option("--model", 
+              "-m", 
+              default="all", 
+              type=str)
+def upload(weights:str, model:str="all"):
+    base_path = os.path.join("src", "models")
     if weights == "cls":
-        source = os.path.join("src", "models", "vgg_classification", "big", "checkpoint"," vgg16-0031.weights.h5")
+        source = os.path.join(base_path, "vgg_classification", "big", "checkpoint"," vgg16-0031.weights.h5")
         dest = "vgg_classification.weights.h5"
+
     elif weights == "seg":
-         source = os.path.join("src", "models", "yolo_segmentation", "model")
-         dest = "vgg_segmentation.weights.h5"
+        base_path = os.path.join(base_path, "yolo_segmentation")
+        if model == "vgg":
+            source = os.path.join(base_path, "model")
+            dest = "vgg_segmentation.weights.h5"
+        elif model == "yolo":
+            source = os.path.join(base_path, "runs", "detect_iter1", "train", "weights", "best.pt")
+            dest = "yolo_segmentation.pt"
+
+    elif weights == "total":
+        source = os.path.join(base_path, "yolo_total", "runs", "detect_iter3", "train", "weights", "best.pt")
+        dest = "yolo_total.pt"
     upload_blob("all-weights", 
                 source_file_name=source, 
                 destination_blob_name=dest)
+    
+    pass
+
+@saison.command(name="load_models", help="Load models from bucket")
+def load_models():
+    model.load_models()
