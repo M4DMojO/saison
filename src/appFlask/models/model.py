@@ -168,7 +168,7 @@ def load_models() -> list:
     vgg_cls = load_vgg_from_weights(os.path.join(base_path, 'vgg_classification_big.keras'))
     
     return [yolo_total,
-            #combined_model,
+            combined_model,
             vgg_cls]
 
 def get_results(model:Model|YOLO|YOLOToVGG, 

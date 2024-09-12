@@ -10,7 +10,7 @@ def get_all_weights_from_bucket():
     """
     Load the wieghts of all the models : cls, seg and total
     """
-    for model in ["cls", 'total']:
+    for model in ["cls", "seg", 'total']:
         get_weights_from_bucket(model)
 
 def get_weights_from_bucket(model:str):
