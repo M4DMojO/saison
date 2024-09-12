@@ -1,12 +1,16 @@
 from flask import Flask, render_template, request, redirect, url_for
-import os
-import logging
+from models.model import load_models, get_results
+import custom_function as custom
 from werkzeug.utils import secure_filename
 from datetime import datetime
 import cv2
 import json
+import shutil
+import json
+import logging
+import os
 import custom_function as custom
-
+ 
 app = Flask(__name__)
 
 # Configuration du logger
@@ -40,6 +44,8 @@ app.config['MINIMUM_CONFIDENCE'] = 0.5
 app.config['CURRENT_MODEL_ID'] = "0"  # yolo_total par défaut
 app.config['CURRENT_COUNTRY_ID'] = "season_fr"  # France par défaut
 app.config['CURRENT_MONTH_ID'] = datetime.today().strftime("%m")  # Mois actuel
+
+models = load_models()
 
 # Assurer que le dossier de téléchargement existe
 os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
@@ -102,10 +108,12 @@ def mode_photo_result():
     if img is None:
         logging.error("Route '/mode_photo_result' : Impossible de lire l'image.")
         return redirect(url_for('mode_photo'))
+    
+    results = get_results(models[model_id], img, model_id)
 
     # Prédiction
     try:
-        img_out = custom.draw_bounding_boxes(img, app.config, img_path=file_path)
+        img_out = custom.draw_bounding_boxes(img, app.config,results)
     except Exception as e:
         logging.error(f"Route '/mode_photo_result' : Erreur lors du traitement de l'image - {e}")
         return redirect(url_for('mode_photo'))
