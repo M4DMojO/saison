@@ -92,7 +92,7 @@
         "12": "december"
     },
     "model_dict": {
-        "0": "YOYO seul",
+        "0": "YOLO seul",
         "1": "YOLO > VGG",
         "2": "VGG seul"
     },
