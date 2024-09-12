@@ -130,7 +130,7 @@ h1 span {
 }
 
 .image-container {
-    height: 550px;  /* Hauteur maximale du conteneur */
+    height: 500px;  /* Hauteur maximale du conteneur */
     width: 800px;   /* Largeur maximale du conteneur */
 }
 

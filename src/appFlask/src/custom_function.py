@@ -1,5 +1,8 @@
 import cv2
 from ultralytics import YOLO
+import unicodedata
+from werkzeug.utils import secure_filename
+import os
 
 
 def _get_result_from_yolo_total(results):
@@ -122,7 +125,7 @@ def _draw_one_bounding_box(img, data):
     return img
 
 
-def draw_bounding_boxes(img, config_dict, img_path):
+def draw_bounding_boxes(img, config_dict):
     """
     Applique le modèle choisit par l'utilisateur, détermine la saisonnalité, et dessine des bounding boxes autour des fruits détectés.
 
@@ -137,7 +140,7 @@ def draw_bounding_boxes(img, config_dict, img_path):
     # Chargement du modèle YOLO selon l'ID du modèle
     if config_dict['CURRENT_MODEL_ID'] == "0":  # modèle YOLO total
         model = YOLO('../models/yolo_total.pt')
-        predict = model(img_path)
+        predict = model(config_dict['IMG_SRC_PATH'])
         results = _get_result_from_yolo_total(predict)
     elif config_dict['CURRENT_MODEL_ID'] == "1":
         pass
@@ -188,3 +191,31 @@ def draw_bounding_boxes(img, config_dict, img_path):
 
     # Retourner l'image finale avec les bounding boxes
     return img_with_border
+
+
+
+# Fonction pour supprimer les accents
+def _remove_accents(input_str):
+    nfkd_form = unicodedata.normalize('NFKD', input_str)
+    return ''.join([c for c in nfkd_form if not unicodedata.combining(c)])
+
+# Fonction pour sécuriser le nom du fichier
+def clean_filename(filename):
+    # Supprimer les accents du nom du fichier
+    filename = _remove_accents(filename)
+
+    # Séparer le nom du fichier et l'extension
+    name, ext = os.path.splitext(filename)
+
+    # Remplacer les points dans le nom par des underscores
+    name = name.replace('.', '_')
+
+    # Recréer le nom du fichier avec l'extension
+    cleaned_filename = f"{name}{ext}"
+
+    # Sécuriser le nom du fichier en utilisant secure_filename
+    return secure_filename(cleaned_filename)
+
+# Fonction pour vérifier l'extension du fichier image
+def allowed_file(filename):
+    return "." in filename and filename.rsplit(".", 1)[1].lower() in {"jpg", "jpeg"}

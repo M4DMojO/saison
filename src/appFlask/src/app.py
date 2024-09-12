@@ -1,7 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for
 import os
 import logging
-from werkzeug.utils import secure_filename
 from datetime import datetime
 import cv2
 import json
@@ -11,10 +10,6 @@ app = Flask(__name__)
 
 # Configuration du logger
 logging.basicConfig(level=logging.DEBUG, handlers=[logging.StreamHandler()])
-
-# Fonction pour vérifier l'extension du fichier image
-def allowed_file(filename):
-    return "." in filename and filename.rsplit(".", 1)[1].lower() in {"jpg", "jpeg"}
 
 # Chargement des dictionnaires à partir du fichier JSON
 with open('../data/season.json', 'r') as f:
@@ -40,6 +35,10 @@ app.config['MINIMUM_CONFIDENCE'] = 0.5
 app.config['CURRENT_MODEL_ID'] = "0"  # yolo_total par défaut
 app.config['CURRENT_COUNTRY_ID'] = "season_fr"  # France par défaut
 app.config['CURRENT_MONTH_ID'] = datetime.today().strftime("%m")  # Mois actuel
+
+
+# Flag changement de param pour le check d'une image
+flag_recheck_pic = False
 
 # Assurer que le dossier de téléchargement existe
 os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
@@ -75,55 +74,63 @@ def mode_photo():
 def mode_photo_result():
     logging.info("Route '/mode_photo_result' : Traitement de la requête POST.")
 
-    # Vérifier si un fichier a été soumis
-    if 'img_ipt' not in request.files or request.files['img_ipt'].filename == '':
-        logging.error("Route '/mode_photo_result' : Aucun fichier sélectionné.")
-        return redirect(url_for('mode_photo'))  # Rediriger vers le formulaire
+    # Vérification de la valeur du flag 'flag_recheck_pic'
+    flag_recheck_pic = request.form.get('flag_recheck_pic', 'False') == 'True'
 
-    file = request.files['img_ipt']
+    # Chargement de l'image uploadée sauf en cas de re-check
+    if not flag_recheck_pic :
+        # Vérifier si un fichier a été soumis
+        if 'img_ipt' not in request.files or request.files['img_ipt'].filename == '':
+            logging.error("Route '/mode_photo_result' : Aucun fichier sélectionné.")
+            return redirect(url_for('mode_photo'))  # Rediriger vers le formulaire
 
-    # Valider et sécuriser le nom du fichier
-    if not allowed_file(file.filename):
-        logging.error("Route '/mode_photo_result' : Format de fichier non supporté.")
-        return redirect(url_for('mode_photo'))
+        file = request.files['img_ipt']
 
-    filename = secure_filename(file.filename)
-    file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-    file.save(file_path)
-    
-    logging.info(f"Route '/mode_photo_result' : Fichier enregistré sous {file_path}")
+        # Valider et sécuriser le nom du fichier
+        if not custom.allowed_file(file.filename):
+            logging.error("Route '/mode_photo_result' : Format de fichier non supporté.")
+            return redirect(url_for('mode_photo'))
+
+        # Nettoyer le nom du fichier en supprimant les accents et les points non autorisés
+        filename = custom.clean_filename(file.filename)
+        
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        file.save(file_path)
+
+        app.config['IMG_SRC_PATH'] = file_path
+        
+        logging.info(f"Route '/mode_photo_result' : Fichier enregistré sous {file_path}")
+
+    # Re-check : on recharge le formulaire pour récupérer les nouvelles valeurs des paramètres
+    if flag_recheck_pic :
+        load_form()
 
     # Vérifier l'ID du modèle actuel
     model_id = app.config.get('CURRENT_MODEL_ID', '0')
     logging.error(f"Route '/mode_photo_result' : model _id = {model_id}")
 
     # Lire l'image depuis le chemin du fichier
-    img = cv2.imread(file_path)
+    img = cv2.imread(app.config['IMG_SRC_PATH'])
     if img is None:
         logging.error("Route '/mode_photo_result' : Impossible de lire l'image.")
         return redirect(url_for('mode_photo'))
 
     # Prédiction
     try:
-        img_out = custom.draw_bounding_boxes(img, app.config, img_path=file_path)
+        img_out = custom.draw_bounding_boxes(img, app.config)
     except Exception as e:
         logging.error(f"Route '/mode_photo_result' : Erreur lors du traitement de l'image - {e}")
         return redirect(url_for('mode_photo'))
 
     # Définir le chemin de sortie de l'image modifiée
-    output_filename = f"{os.path.splitext(filename)[0]}_out.jpg"
-    output_path = os.path.join(app.config['UPLOAD_FOLDER'], output_filename)
+    logging.info(f"Route '/mode_photo_result' : path source : {app.config['IMG_SRC_PATH']}")
+    file_path_start, file_path_end = app.config['IMG_SRC_PATH'].split('.')
+    logging.info(f"Route '/mode_photo_result' : file_path_start = {file_path_start}; file_path_end = {file_path_end}")
+    output_path = file_path_start + "_out." + file_path_end
 
     # Sauvegarder l'image traitée
     cv2.imwrite(output_path, img_out)
     logging.info(f"Route '/mode_photo_result' : Image modifiée enregistrée sous {output_path}")
-
-    # Supprimer le fichier original
-    try:
-        os.remove(file_path)
-        logging.info(f"Route '/mode_photo_result' : Fichier original supprimé : {file_path}")
-    except Exception as e:
-        logging.error(f"Route '/mode_photo_result' : Erreur lors de la suppression du fichier original - {e}")
 
     # Préparer les données à afficher
     output_dict = {
@@ -133,7 +140,7 @@ def mode_photo_result():
         "image_path": output_path
     }
 
-    return render_template("mode_photo_result.html", output_dict=output_dict)
+    return render_template("mode_photo_result.html", output_dict=output_dict, app_dict=app.config)
 
 
 @app.route("/mode_video", methods=["POST"])
