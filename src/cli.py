@@ -140,8 +140,6 @@ def upload(weights:str, model:str="all"):
         if model == "vgg":
             source = os.path.join(base_path, "model")
             dest = "vgg_segmentation.weights.h5"
-        elif model == "all":
-            pass
         elif model == "yolo":
             source = os.path.join(base_path, "runs", "detect_iter1", "train", "weights", "best.pt")
             dest = "yolo_segmentation.pt"
@@ -158,7 +156,3 @@ def upload(weights:str, model:str="all"):
 @saison.command(name="load_models", help="Load models from bucket")
 def load_models():
     model.load_models()
-
-@saison.command(name="remake the vgg big from weights.h5 to .h5")
-def remake():
-    model.remake_vgg()

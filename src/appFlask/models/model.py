@@ -133,7 +133,7 @@ def load_vgg_from_weights(weight_path:str)-> Model:
     Returns:
         Model: Model with custom vgg16 architecture and weights
     """
-    print(weight_path)
+    print("loading vgg from: ", weight_path)
     return load_model(weight_path)
 
 def remake_vgg():
@@ -162,9 +162,9 @@ def load_models() -> list:
         print("--"*10)
 
     yolo_total = YOLO(os.path.join(base_path, "yolo_total.pt"))
-    #yolo_seg = YOLO(os.path.join(base_path, 'yolo_segmentation.pt'))
-    #vgg_seg = load_vgg_from_weights(os.path.join(base_path, 'vgg_classification_small.h5'))
-    #combined_model = YOLOToVGG(yolo_seg, vgg_seg)
+    yolo_seg = YOLO(os.path.join(base_path, 'yolo_segmentation.pt'))
+    vgg_seg = load_vgg_from_weights(os.path.join(base_path, 'vgg_classification_small.h5'))
+    combined_model = YOLOToVGG(yolo_seg, vgg_seg)
     vgg_cls = load_vgg_from_weights(os.path.join(base_path, 'vgg_classification_big.keras'))
     
     return [yolo_total,

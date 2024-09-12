@@ -295,10 +295,8 @@ def fit_and_export(train_generator, validation_generator,
                 validation_data=validation_generator,
                 epochs=epochs, 
                 callbacks=[schedule, chekpoint, stopping])
-    #Export model
-    model.export(
-                save_path, 
-                format='h5')
+    #save model
+    model.save(save_path)
 
     return model
 
