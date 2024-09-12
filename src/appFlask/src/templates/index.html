@@ -8,19 +8,9 @@
     <title>Seasonal Fruits and Veggies AI Calendar</title>
 </head>
 <body>
-    <form action="{{ url_for('result') }}" method="post" onsubmit="return validateForm()" enctype="multipart/form-data"> 
-        <!-- enctype="multipart/form-data" : permet de récupérer des fichiers -->
+    <form method="post"> 
         <div>
-            <h1>Seasonal Fruits <br/> and Veggies AI Calendar</h1>
-        
-            <input type="file" name="img_ipt" id="img_ipt" accept="image/jpg, image/jpeg" onchange="handleImageUpload()" style="display:none;"/>
-            
-            <div id="image-preview" class="no-image">
-                <img id="uploaded-image">
-                <div id="error-message">Please select a picture.</div>
-            </div>
-
-            <br/>
+            <h1>S<span>AI</span>son </h1>
 
             <select name="model_id">
                 {% for id, model in app_dict['MODELS'].items() %}
@@ -51,84 +41,12 @@
             </select>
 
             <br/>
+            <br/>
             
-            <button type="submit" id="check-button" disabled>Check</button>
+            <button type="submit" formaction="{{ url_for('mode_photo') }}">Mode photo</button>
+            <br/>
+            <button type="submit" formaction="{{ url_for('mode_video') }}">Mode vidéo</button>
         </div>
     </form>
-    
-    <script>
-        function handleImageUpload() {
-            const fileInput = document.getElementById('img_ipt');
-            const uploadedImage = document.getElementById('uploaded-image');
-            const errorMessage = document.getElementById('error-message');
-            const imagePreview = document.getElementById('image-preview');
-            const checkButton = document.getElementById('check-button');
-            const file = fileInput.files[0];
-
-            if (file) {
-                // Check le type de fichier
-                const validTypes = ['image/jpeg', 'image/jpg'];
-                if (!validTypes.includes(file.type)) {
-                    errorMessage.textContent = 'Please select a picture. (.JPEG or .JPG)';
-                    checkButton.disabled = true;  // Désactive le bouton si mauvais type de fichier
-                    return;
-                }
-
-                // Affichage de l'image
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    uploadedImage.src = e.target.result;
-                    errorMessage.style.display = 'none';
-                };
-                reader.readAsDataURL(file);
-                imagePreview.setAttribute('class', ''); // Suppression de la class pour l'affichage
-                uploadedImage.style.cssText = 'box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);';
-                
-                // Active le bouton Check lorsque l'image est correctement sélectionnée
-                checkButton.disabled = false;
-            } 
-        }
-
-        // Add click event listener to open file dialog when the area is clicked
-        document.getElementById('image-preview').addEventListener('click', function() {
-            document.getElementById('img_ipt').click();
-        });
-
-        // Validation du formulaire avant la soumission
-        function validateForm() {
-            const fileInput = document.getElementById('img_ipt');
-            const uploadedImage = document.getElementById('uploaded-image');
-            
-            // Check if a file has been uploaded or if an image has been preloaded via imagePath
-            if (!fileInput.files[0] && !uploadedImage.src) {
-                alert("Please upload an image before submitting.");
-                return false;  // Prevents form submission
-            }
-            return true;  // Allows form submission if an image is present
-        }
-
-        // Simulate image upload if image_path is available
-        document.addEventListener('DOMContentLoaded', function() {
-            const imagePath = "{{ app_dict['CURRENT_IMAGE_PATH'] }}";
-            if (imagePath) {
-                const imagePreview = document.getElementById('image-preview');
-                const uploadedImage = document.getElementById('uploaded-image');
-                const fileInput = document.getElementById('img_ipt');
-                const errorMessage = document.getElementById('error-message');
-                const checkButton = document.getElementById('check-button');
-
-                // Simulate file selection
-                uploadedImage.src = imagePath;
-                imagePreview.setAttribute('class', ''); // Remove 'no-image' class
-                uploadedImage.style.cssText = 'box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);';
-                checkButton.disabled = false;
-                errorMessage.style.display = 'none'; // Caché le message d'erreur
-
-                // Simulate a file input change event
-                const event = new Event('change');
-                fileInput.dispatchEvent(event);
-            }
-        });
-    </script>
 </body>
 </html>

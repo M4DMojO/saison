@@ -100,3 +100,26 @@ gcloud compute scp --recurse /path/to/folder/or/file user@vm:~/new/path/to/folde
 ## transférer un fichier vers un bucket 
 `gsutil cp models/yolo_total/runs/detect/train7/weights/best.pt gs://yolo_total_weights/iter1.pt`
 
+
+## docker
+En local : 
+
+créer l'image : `docker buildx build . -t flask_app_saison`
+lancer le docker : `docker run -p 5000:5000 --name container_saison flask_app_saison`
+
+L'appli est dispo en local http://localhost:5000
+
+taguer l'image pour GCR : `docker tag flask_app_saison gcr.io/saison-artefact-projet/flask_app_saison:latest`
+pousser l'image sur GCR : `docker push gcr.io/saison-artefact-projet/flask_app_saison:latest `
+
+Dans la VM : 
+
+update : `sudo apt update`
+installer docker : `sudo apt install docker.io`
+démarrer docker : `sudo systemctl start docker`
+enabler docker au démarrage : `sudo systemctl enable docker`
+
+
+Cloud run :
+https://console.cloud.google.com/run/create?hl=fr&project=saison-artefact-projet&authuser=1
+

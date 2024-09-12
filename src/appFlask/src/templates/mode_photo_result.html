@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en" class="page_format">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../static/common.css">
+    <link rel="stylesheet" href="../static/mode_photo_result.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>Seasonal Fruits and Veggies AI Calendar</title>
+</head>
+<body>
+    <div class="container">
+
+        <a href="{{ url_for('index') }}" class="home-button">
+          <i class="fas fa-home"></i>
+        </a>
+
+        <h1>S<span>AI</span>son </h1>
+
+        <div>
+            <table class="scan_param">
+                <tr>
+                  <td>Model:</td>
+                  <td>{{ output_dict.model_name }}</td>
+                </tr>
+                <tr>
+                  <td>Month:</td>
+                  <td>{{ output_dict.month_name }}</td>
+                </tr>
+                <tr>
+                  <td>Country:</td>
+                  <td>{{ output_dict.country_name }}</td>
+                </tr>
+              </table>    
+              
+              <div class="legend">
+                <span class="legend-item"><span class="color-circle" style="background-color: rgb(255, 0, 0);"></span>Out of Season</span>
+                <span class="legend-item"><span class="color-circle" style="background-color: rgb(255, 165, 0);"></span>Almost seasonal</span>
+                <span class="legend-item"><span class="color-circle" style="background-color: rgb(0, 255, 0);"></span>Seasonal</span>
+            </div>
+
+        </div>
+
+        <div id="image-preview" class="image-container">
+          <img name="img_out" id="uploaded-image" src="{{ output_dict.image_path }}" alt="Uploaded Image">
+          <div id="zoom-overlay" class="zoomed"></div>
+        </div>
+           
+
+
+        <div>
+        </div>
+        <form action="{{ url_for('mode_photo') }}" method="get">
+            <button type="submit" id="check-button">New scan</button>
+        </form>
+    </div>
+    <script>
+      document.addEventListener("DOMContentLoaded", function() {
+          const imageContainer = document.querySelector(".image-container");
+          const uploadedImage = document.querySelector("#uploaded-image");
+          const zoomBox = document.createElement("div"); // Boîte de zoom
+      
+          
+          uploadedImage.onload = function() {
+              // Vérifier si l'image dépasse 1000x1000 pixels
+              if (uploadedImage.naturalWidth > 1000 || uploadedImage.naturalHeight > 1000) {
+                  // Ajoute un élément div pour la boîte de zoom
+                  zoomBox.classList.add("zoom-box");
+                  imageContainer.appendChild(zoomBox);
+      
+                  // Création d'une image agrandie dans la boîte de zoom
+                  const zoomedImage = new Image();
+                  zoomedImage.src = uploadedImage.src;
+                  zoomBox.appendChild(zoomedImage);
+      
+                  // Gérer le mouvement de la souris sur l'image
+                  imageContainer.addEventListener("mousemove", function(event) {
+                      const containerRect = imageContainer.getBoundingClientRect();
+                      const offsetX = event.clientX - containerRect.left;
+                      const offsetY = event.clientY - containerRect.top;
+      
+                      // Mettre à jour la position de la boîte de zoom à côté du curseur
+                      zoomBox.style.display = "block";
+                      zoomBox.style.left = `${event.clientX - 500}px`;  
+                      zoomBox.style.top = `${event.clientY - 300}px`;   
+      
+                      // Calculer la position du zoom sur l'image
+                      const percentageX = offsetX / containerRect.width;
+                      const percentageY = offsetY / containerRect.height;
+      
+                      // Calcul du déplacement de l'image zoomée dans la boîte
+                      const zoomX = -percentageX * (zoomedImage.width - zoomBox.offsetWidth/2);
+                      const zoomY = -percentageY * (zoomedImage.height - zoomBox.offsetHeight);
+      
+                      // Appliquer la translation à l'image dans la boîte de zoom
+                      zoomedImage.style.transform = `translate(${zoomX}px, ${zoomY}px)`;
+                  });
+      
+                  // Masquer la boîte de zoom lorsque la souris quitte la zone de l'image
+                  imageContainer.addEventListener("mouseleave", function() {
+                      zoomBox.style.display = "none";
+                  });
+              }
+          };
+      });
+      </script>
+      
+      
+</body>
+
+
+</html>

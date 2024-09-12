@@ -122,7 +122,7 @@ def _draw_one_bounding_box(img, data):
     return img
 
 
-def draw_bounding_boxes(img, config_dict):
+def draw_bounding_boxes(img, config_dict, img_path):
     """
     Applique le modèle choisit par l'utilisateur, détermine la saisonnalité, et dessine des bounding boxes autour des fruits détectés.
 
@@ -133,10 +133,11 @@ def draw_bounding_boxes(img, config_dict):
     Returns:
     numpy array: Image avec les bounding boxes dessinées.
     """
+
     # Chargement du modèle YOLO selon l'ID du modèle
     if config_dict['CURRENT_MODEL_ID'] == "0":  # modèle YOLO total
         model = YOLO('../models/yolo_total.pt')
-        predict = model(config_dict['CURRENT_IMAGE_PATH'])
+        predict = model(img_path)
         results = _get_result_from_yolo_total(predict)
     elif config_dict['CURRENT_MODEL_ID'] == "1":
         pass
@@ -145,32 +146,45 @@ def draw_bounding_boxes(img, config_dict):
 
     # Parcourir les résultats de détection
     for result in results:
-        fruit_id = result['fruit_id']
+        confidence = result['confidence']
         
-        # Détermination de la saisonnalité du fruit
-        fruit_months = config_dict['FRUIT_SEASONS'][fruit_id][config_dict['CURRENT_COUNTRY_ID']]
-        current_month = int(config_dict['CURRENT_MONTH_ID'])
-        all_months = config_dict['MONTHS']
+        if confidence >= config_dict['MINIMUM_CONFIDENCE']:
+            fruit_id = result['fruit_id']
+            
+            # Détermination de la saisonnalité du fruit
+            fruit_months = config_dict['FRUIT_SEASONS'][fruit_id][config_dict['CURRENT_COUNTRY_ID']]
+            current_month = int(config_dict['CURRENT_MONTH_ID'])
+            all_months = config_dict['MONTHS']
 
-        # Vérification de la saisonnalité
-        if current_month in date_period(fruit_months, all_months):
-            seasonality = "2"  # En saison
-        elif current_month in enclosing_month(fruit_months, all_months):
-            seasonality = "1"  # Hors saison proche
-        else:
-            seasonality = "0"  # Hors saison
+            # Vérification de la saisonnalité
+            if current_month in date_period(fruit_months, all_months):
+                seasonality = "2"  # En saison
+            elif current_month in enclosing_month(fruit_months, all_months):
+                seasonality = "1"  # Hors saison proche
+            else:
+                seasonality = "0"  # Hors saison
 
-        # Création du dictionnaire de données pour chaque fruit détecté
-        data = {
-            "x1": result['x1'], "y1": result['y1'],
-            "x2": result['x2'], "y2": result['y2'],
-            "confidence": result['confidence'],
-            "fruit_name": config_dict["FRUITS"][fruit_id],
-            "color": config_dict['SEASONALITY_TO_COLOR'][seasonality]
-        }
+            # Création du dictionnaire de données pour chaque fruit détecté
+            data = {
+                "x1": result['x1'], "y1": result['y1'],
+                "x2": result['x2'], "y2": result['y2'],
+                "confidence": confidence,
+                "fruit_name": config_dict["FRUITS"][fruit_id],
+                "color": config_dict['SEASONALITY_TO_COLOR'][seasonality]
+            }
 
-        # Dessiner la bounding box avec le label
-        img = _draw_one_bounding_box(img, data)
+            # Dessiner la bounding box avec le label
+            img = _draw_one_bounding_box(img, data)
+
+    
+    # ajout d'une bordure au bord de l'image
+    border_color = (245, 245, 245)  # Couleur en RGB : --color-background-dark: #f5f5f5 du HTML
+    img_with_border = cv2.copyMakeBorder(
+                                        img,
+                                        50, 50, 50, 50,  # Top, Bottom, Left, Right
+                                        cv2.BORDER_CONSTANT,
+                                        value=border_color
+                                    )
 
     # Retourner l'image finale avec les bounding boxes
-    return img
+    return img_with_border
