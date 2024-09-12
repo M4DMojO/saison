@@ -31,12 +31,14 @@ def get_weights_from_bucket(model:str):
         else:
             name = "yolo_total.pt"
         blob = bucket.blob(name)
+        print("loading :", name)
         destination_file_name = join(base_path, name)
         blob.download_to_filename(destination_file_name)
     elif model == "seg":
         for name in ["vgg_classification_small.keras", "yolo_segmentation.pt"]:
             blob = bucket.blob(name)
             destination_file_name = join(base_path, name)
+            print("loading :", name)
             blob.download_to_filename(destination_file_name)
     else:
         raise Exception("No such argument, use : cls|total|seg")
