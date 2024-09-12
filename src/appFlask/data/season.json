@@ -92,9 +92,9 @@
         "12": "december"
     },
     "model_dict": {
-        "0": "yolo_total",
-        "1": "yolo_segmentation",
-        "2": "vgg"
+        "0": "YOYO seul",
+        "1": "YOLO > VGG",
+        "2": "VGG seul"
     },
     "countries_dict": {
         "season_fr": "France",

@@ -1,19 +1,17 @@
 from flask import Flask, render_template, request, redirect, url_for
-from models.model import load_models, get_results
-import custom_function as custom
 from datetime import datetime
 import cv2
 import json
-import shutil
-import json
 import logging
 import os
-import custom_function as custom
+
+from model import load_models, get_results
+from custom_function import allowed_file, clean_filename, draw_bounding_boxes
  
 app = Flask(__name__)
 
 # Configuration du logger
-logging.basicConfig(level=logging.DEBUG, handlers=[logging.StreamHandler()])
+logging.basicConfig(level=logging.INFO, handlers=[logging.StreamHandler()])
 
 # Chargement des dictionnaires à partir du fichier JSON
 with open('../data/season.json', 'r') as f:
@@ -21,7 +19,7 @@ with open('../data/season.json', 'r') as f:
 
 app.config['FRUITS'] = {item['_id']: item['name'] for item in data['master_season']}
 app.config['MODELS'] = data['model_dict']
-app.config['MONTHS'] = data['month_dict']
+app.config['MONTHS'] = { key : value.capitalize() for key, value in data['month_dict'].items()}
 app.config['COUNTRIES'] = data['countries_dict']
 app.config['SEASONALITY_TO_COLOR'] = data['seasonality_color_dict_bgr']
 app.config['FRUIT_SEASONS'] = {
@@ -66,7 +64,6 @@ def load_form():
 # Page d'accueil
 @app.route("/")
 def index():
-    logging.info("Accès à la page d'accueil.")
     return render_template("index.html", app_dict=app.config)
 
 @app.route("/mode_photo", methods=["POST", "GET"])
@@ -78,8 +75,6 @@ def mode_photo():
 # Page de résultat
 @app.route("/mode_photo_result", methods=["POST"])
 def mode_photo_result():
-    logging.info("Route '/mode_photo_result' : Traitement de la requête POST.")
-
     # Vérification de la valeur du flag 'flag_recheck_pic'
     flag_recheck_pic = request.form.get('flag_recheck_pic', 'False') == 'True'
 
@@ -93,12 +88,12 @@ def mode_photo_result():
         file = request.files['img_ipt']
 
         # Valider et sécuriser le nom du fichier
-        if not custom.allowed_file(file.filename):
+        if not allowed_file(file.filename):
             logging.error("Route '/mode_photo_result' : Format de fichier non supporté.")
             return redirect(url_for('mode_photo'))
 
         # Nettoyer le nom du fichier en supprimant les accents et les points non autorisés
-        filename = custom.clean_filename(file.filename)
+        filename = clean_filename(file.filename)
         
         file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         file.save(file_path)
@@ -113,19 +108,33 @@ def mode_photo_result():
 
     # Vérifier l'ID du modèle actuel
     model_id = app.config.get('CURRENT_MODEL_ID', '0')
-    logging.error(f"Route '/mode_photo_result' : model _id = {model_id}")
+    logging.info(f"Route '/mode_photo_result' : model _id = {model_id}")
 
     # Lire l'image depuis le chemin du fichier
     img = cv2.imread(app.config['IMG_SRC_PATH'])
     if img is None:
-        logging.error("Route '/mode_photo_result' : Impossible de lire l'image.")
+        logging.info("Route '/mode_photo_result' : Impossible de lire l'image.")
         return redirect(url_for('mode_photo'))
     
-    results = get_results(models[model_id], img, model_id)
+
+
+    # ajout d'une bordure au bord de l'image
+    border_color = (245, 245, 245)  # Couleur en RGB : --color-background-dark: #f5f5f5 du HTML
+    img_with_border = cv2.copyMakeBorder(
+                                        img,
+                                        50, 50, 50, 50,  # Top, Bottom, Left, Right
+                                        cv2.BORDER_CONSTANT,
+                                        value=border_color
+                                    )
+    
+    app.config['IMG_SRC_BORDER_PATH'] = app.config['IMG_SRC_PATH'].split('.')[0] + '_border.jpg'
+    cv2.imwrite(app.config['IMG_SRC_BORDER_PATH'], img_with_border)
+
+    results = get_results(models[int(model_id)], app.config['IMG_SRC_BORDER_PATH'], int(model_id))
 
     # Prédiction
     try:
-        img_out = custom.draw_bounding_boxes(img, app.config,results)
+        img_out = draw_bounding_boxes(img_with_border, app.config, results)
     except Exception as e:
         logging.error(f"Route '/mode_photo_result' : Erreur lors du traitement de l'image - {e}")
         return redirect(url_for('mode_photo'))

@@ -1,5 +1,5 @@
 import cv2
-
+import logging
 from os.path import join
 
 from ultralytics import YOLO
@@ -16,6 +16,7 @@ def get_all_weights_from_bucket():
     for model in ["cls", "seg", 'total']:
         get_weights_from_bucket(model)
 
+
 def get_weights_from_bucket(model:str):
     """
     Load the weights of a given model
@@ -25,7 +26,7 @@ def get_weights_from_bucket(model:str):
     Raises:
         Exception: raise when not the correct arg is unrecognized
     """
-    storage_client = storage.Client().from_service_account_json('.credentials/keys.json')
+    storage_client = storage.Client()
     bucket = storage_client.bucket('all-weights')
     base_path = join("src", "appFlask", "models")
     if model == "cls" or model == "total":
@@ -45,7 +46,7 @@ def get_weights_from_bucket(model:str):
         raise Exception("No such argument, use : cls|total|seg")
 
 
-def _get_result_from_yolo_total(results):
+def get_result_from_yolo_total(results):
     """
     Extrait les informations de détection d'objet à partir des résultats YOLO.
 
@@ -83,7 +84,7 @@ def date_period(list_of_month, all_months):
     Returns:
     list: Liste d'entiers correspondant aux mois.
     """
-    return [int(x) for x, y in all_months.items() if y in list_of_month]
+    return [int(x) for x, y in all_months.items() if y.lower() in list_of_month]
 
 
 def _number_around(integer, width):
@@ -126,6 +127,8 @@ def enclosing_month(list_of_month, all_months, width=1):
     
     return list(enclosing.difference(set(list_of_month_number)))
 
+
+import logging
 
 def _draw_one_bounding_box(img, data):
     """
@@ -176,19 +179,25 @@ def draw_bounding_boxes(img, config_dict, results):
     Returns:
     numpy array: Image avec les bounding boxes dessinées.
     """
-
+    logging.debug("Début du dessin des bounding boxes")
+    
     # Parcourir les résultats de détection
     for result in results:
         confidence = result['confidence']
         
         if confidence >= config_dict['MINIMUM_CONFIDENCE']:
             fruit_id = result['fruit_id']
-            
+                        
             # Détermination de la saisonnalité du fruit
             fruit_months = config_dict['FRUIT_SEASONS'][fruit_id][config_dict['CURRENT_COUNTRY_ID']]
+            logging.debug(f"fruit_months: {fruit_months}")
             current_month = int(config_dict['CURRENT_MONTH_ID'])
+            logging.debug(f"current_month: {current_month}")
             all_months = config_dict['MONTHS']
+            logging.debug(f"all_months: {all_months}")
 
+            logging.debug(f"date_period(fruit_months, all_months): {date_period(fruit_months, all_months)}")
+            logging.debug(f"enclosing_month(fruit_months, all_months): {enclosing_month(fruit_months, all_months)}")
             # Vérification de la saisonnalité
             if current_month in date_period(fruit_months, all_months):
                 seasonality = "2"  # En saison
@@ -197,6 +206,8 @@ def draw_bounding_boxes(img, config_dict, results):
             else:
                 seasonality = "0"  # Hors saison
 
+
+            logging.debug(f"Détermination de la saisonnalité pour {config_dict['FRUITS'][fruit_id]}: {seasonality}")
             # Création du dictionnaire de données pour chaque fruit détecté
             data = {
                 "x1": result['x1'], "y1": result['y1'],
@@ -206,21 +217,13 @@ def draw_bounding_boxes(img, config_dict, results):
                 "color": config_dict['SEASONALITY_TO_COLOR'][seasonality]
             }
 
+            logging.debug(f"Dessin de la bounding box pour {data['fruit_name']}")
             # Dessiner la bounding box avec le label
             img = _draw_one_bounding_box(img, data)
 
-    
-    # ajout d'une bordure au bord de l'image
-    border_color = (245, 245, 245)  # Couleur en RGB : --color-background-dark: #f5f5f5 du HTML
-    img_with_border = cv2.copyMakeBorder(
-                                        img,
-                                        50, 50, 50, 50,  # Top, Bottom, Left, Right
-                                        cv2.BORDER_CONSTANT,
-                                        value=border_color
-                                    )
-
+    logging.debug("Fin du dessin des bounding boxes")
     # Retourner l'image finale avec les bounding boxes
-    return img_with_border
+    return img
 
 
 
