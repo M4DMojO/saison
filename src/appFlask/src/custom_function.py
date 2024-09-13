@@ -171,7 +171,50 @@ def _draw_one_bounding_box(img, data):
     return img
 
 
-def draw_bounding_boxes(img, config_dict, results):
+
+
+def draw_bounding_boxes_image(img, config_dict, results):
+    for result in results:
+        confidence = result['confidence']
+
+        if confidence >= config_dict['MINIMUM_CONFIDENCE']:
+            fruit_id = result['fruit_id']
+
+            # Détermination de la saisonnalité du fruit
+            fruit_months = config_dict['FRUIT_SEASONS'][fruit_id][config_dict['CURRENT_COUNTRY_ID']]
+            logging.debug(f"fruit_months: {fruit_months}")
+            current_month = int(config_dict['CURRENT_MONTH_ID'])
+            logging.debug(f"current_month: {current_month}")
+            all_months = config_dict['MONTHS']
+            logging.debug(f"all_months: {all_months}")
+
+            logging.debug(f"date_period(fruit_months, all_months): {date_period(fruit_months, all_months)}")
+            logging.debug(f"enclosing_month(fruit_months, all_months): {enclosing_month(fruit_months, all_months)}")
+            # Vérification de la saisonnalité
+            if current_month in date_period(fruit_months, all_months):
+                seasonality = "2"  # En saison
+            elif current_month in enclosing_month(fruit_months, all_months):
+                seasonality = "1"  # Hors saison proche
+            else:
+                seasonality = "0"  # Hors saison
+
+
+            logging.debug(f"Détermination de la saisonnalité pour {config_dict['FRUITS'][fruit_id]}: {seasonality}")
+            # Création du dictionnaire de données pour chaque fruit détecté
+            data = {
+                "x1": result['x1'], "y1": result['y1'],
+                "x2": result['x2'], "y2": result['y2'],
+                "confidence": confidence,
+                "fruit_name": config_dict["FRUITS"][fruit_id],
+                "color": config_dict['SEASONALITY_TO_COLOR'][seasonality]
+            }
+
+            logging.debug(f"Dessin de la bounding box pour {data['fruit_name']}")
+            # Dessiner la bounding box avec le label
+            img = _draw_one_bounding_box(img, data)
+    return img
+
+def draw_bounding_boxes_video(img, config_dict, results):
     """
     Applique le modèle choisit par l'utilisateur, détermine la saisonnalité, et dessine des bounding boxes autour des fruits détectés.
 
@@ -272,13 +315,9 @@ def generate_frame(config_dict, models):
             break
 
         model_id = config_dict.get('CURRENT_MODEL_ID', '0')
-        model = models[int(model_id)]
-
-        try:
-            results = model(frame)
-        except Exception as e:
-            logging.error(f"Erreur lors de la prédiction sur la frame vidéo : {e}")
-            continue
+        #model = models[int(model_id)]
+        # On force le modèle YoloTotal par sécurité
+        model = models[0]
 
         border_color = (245, 245, 245)
         frame_with_border = cv2.copyMakeBorder(
@@ -288,7 +327,13 @@ def generate_frame(config_dict, models):
         )
 
         try:
-            frame_out = draw_bounding_boxes(frame_with_border, config_dict, results)
+            results = model(frame_with_border)
+        except Exception as e:
+            logging.error(f"Erreur lors de la prédiction sur la frame vidéo : {e}")
+            continue
+
+        try:
+            frame_out = draw_bounding_boxes_video(frame_with_border, config_dict, results)
         except Exception as e:
             logging.error(f"Erreur lors du dessin des boîtes de délimitation: {e}")
             continue

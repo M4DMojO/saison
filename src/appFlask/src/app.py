@@ -6,7 +6,7 @@ import logging
 import os
 
 from model import load_models, get_results
-from custom_function import allowed_file, clean_filename, draw_bounding_boxes, generate_frame
+from custom_function import allowed_file, clean_filename, draw_bounding_boxes_image, generate_frame
  
 app = Flask(__name__)
 
@@ -142,7 +142,7 @@ def mode_photo_result():
 
     # Prédiction
     try:
-        img_out = draw_bounding_boxes(img_with_border, app.config, results)
+        img_out = draw_bounding_boxes_image(img_with_border, app.config, results)
     except Exception as e:
         logging.error(f"Route '/mode_photo_result' : Erreur lors du traitement de l'image - {e}")
         return redirect(url_for('mode_photo'))
@@ -154,7 +154,13 @@ def mode_photo_result():
     output_path = file_path_start + "_out." + file_path_end
 
     # Sauvegarder l'image traitée
-    cv2.imwrite(output_path, img_out)
+    logging.debug(f"Output path : {output_path}")
+    logging.debug(f"Outputpath : {img_out}")
+    try:
+        cv2.imwrite(output_path, img_out)
+    except Exception as e:
+        logging.error(f"Route '/mode_photo_result' : Erreur lors de l'enregistrement de l'image - {e}")
+        return redirect(url_for('mode_photo'))
     logging.info(f"Route '/mode_photo_result' : Image modifiée enregistrée sous {output_path}")
 
     # Préparer les données à afficher

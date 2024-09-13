@@ -104,8 +104,8 @@
       
           
           uploadedImage.onload = function() {
-              // Vérifier si l'image dépasse 1000x1000 pixels
-              if (uploadedImage.naturalWidth > 1000 || uploadedImage.naturalHeight > 1000) {
+              // Vérifier si l'image dépasse 10x10 pixels
+              if (uploadedImage.naturalWidth > 10 || uploadedImage.naturalHeight > 10) {
                   // Ajoute un élément div pour la boîte de zoom
                   zoomBox.classList.add("zoom-box");
                   imageContainer.appendChild(zoomBox);
