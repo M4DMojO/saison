@@ -176,21 +176,11 @@ def mode_video_page():
 
 @app.route("/mode_video", methods=["POST", "GET"])
 def mode_video():
-<<<<<<< HEAD
     if request.method == "POST":
         load_form()  
 
     return Response(generate_frame(config_dict=app.config, models=models), mimetype="multipart/x-mixed-replace; boundary=frame")
 
-
-
-
-=======
-    load_form()
-    config_dict = { 'model' : models[int(app.config.get('CURRENT_MODEL_ID', '0'))],
-                   'classes' :  app.config['FRUITS'].values}
-    return Response(generate_frame(), mimetype="multipart/x-mixed-replace; boundary=frame")
->>>>>>> 8a84b7ea2a7b7677b830d691fbbba60bc7d5ab19
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 8080)), debug=True)
