@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en" class="page_format">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../static/common.css">
+    <link rel="stylesheet" href="../static/mode_video.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>Détection en Mode Vidéo</title>
+</head>
+<body>
+    <a href="{{ url_for('index') }}" class="home-button">
+        <i class="fas fa-home"></i>
+    </a>
+
+    <div class="container">
+        <h1>s<span>AI</span>son</h1>
+
+        <!-- Formulaire pour choisir les paramètres -->
+        <form method="POST" action="{{ url_for('mode_video') }}">
+            <select id="month_id" name="month_id">
+                {% for month_id, month_name in app_dict['MONTHS'].items() %}
+                    <option value="{{ month_id }}" {% if month_id == app_dict['CURRENT_MONTH_ID'] %}selected{% endif %}>
+                        {{ month_name }}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <br/>
+
+            <select id="country_id" name="country_id">
+                {% for country_id, country_name in app_dict['COUNTRIES'].items() %}
+                    <option value="{{ country_id }}" {% if country_id == app_dict['CURRENT_COUNTRY_ID'] %}selected{% endif %}>
+                        {{ country_name }}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <br/>
+
+            <select id="source_type" name="source_type" onchange="handleSourceChange()">
+                <option value="local" {% if app_dict['SOURCE_TYPE'] == 'local' %}selected{% endif %}>Local camera</option>
+                <option value="remote" {% if app_dict['SOURCE_TYPE'] == 'remote' %}selected{% endif %}>Remote camera</option>
+                {% if app_dict['SOURCE_URL'] %}
+                    <option value="remote" {% if app_dict['SOURCE_TYPE'] == 'remote' %}selected{% endif %}>{{ app_dict['SOURCE_URL'] }}</option>
+                {% endif %}
+            </select>
+
+            <br/>
+
+            <input type="hidden" id="source_url" name="source_url" value="{{ app_dict['SOURCE_URL'] }}">
+            
+            <div id="url_display" style="display: none;">
+                <p>Remote camera URL: <span id="display_url">{{ app_dict['SOURCE_URL'] }}</span></p>
+            </div>
+
+            <button type="submit">Go</button>
+        </form>
+    </div>
+
+    <!-- Modale pour l'URL de la caméra distante -->
+    <div id="urlModal" class="modal">
+        <div class="modal-content">
+            <div>
+                <input type="text" id="modal_url_input" placeholder="Remote camera URL">
+                <button onclick="submitUrl()">Save</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        function handleSourceChange() {
+            var sourceType = document.getElementById('source_type').value;
+            var urlModal = document.getElementById('urlModal');
+            var displayUrlInput = document.getElementById('modal_url_input');
+
+            if (sourceType === 'remote') {
+                openModal();
+            } else {
+                closeModal();
+            }
+
+            // Met à jour le champ caché en fonction de la sélection
+            if (sourceType === 'remote') {
+                document.getElementById('source_url').value = document.querySelector('#source_type option:checked').textContent;
+            }
+        }
+
+        function openModal() {
+            document.getElementById('urlModal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('urlModal').style.display = 'none';
+        }
+
+        function submitUrl() {
+            var urlInput = document.getElementById('modal_url_input').value;
+            var sourceSelect = document.getElementById('source_type');
+
+            // Met à jour l'option pour l'URL saisie ou ajoute une nouvelle option
+            var remoteOption = Array.from(sourceSelect.options).find(option => option.value === 'remote');
+            if (remoteOption) {
+                remoteOption.text = urlInput;
+            } else {
+                var newOption = document.createElement('option');
+                newOption.value = 'remote';
+                newOption.text = urlInput;
+                sourceSelect.add(newOption, sourceSelect.options.length);
+            }
+
+            // Sélectionne la nouvelle option
+            sourceSelect.value = 'remote';
+            document.getElementById('source_url').value = urlInput;
+            closeModal();
+        }
+
+        // Fermer la modale lorsque l'utilisateur clique en dehors de la modale
+        window.onclick = function(event) {
+            if (event.target == document.getElementById('urlModal')) {
+                closeModal();
+            }
+        }
+    </script>
+</body>
+</html>

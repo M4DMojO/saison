@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, Response
 from datetime import datetime
 import cv2
 import json
@@ -6,12 +6,12 @@ import logging
 import os
 
 from model import load_models, get_results
-from custom_function import allowed_file, clean_filename, draw_bounding_boxes
+from custom_function import allowed_file, clean_filename, draw_bounding_boxes, generate_frame
  
 app = Flask(__name__)
 
 # Configuration du logger
-logging.basicConfig(level=logging.INFO, handlers=[logging.StreamHandler()])
+logging.basicConfig(level=logging.DEBUG, handlers=[logging.StreamHandler()])
 
 # Chargement des dictionnaires à partir du fichier JSON
 with open('../data/season.json', 'r') as f:
@@ -53,6 +53,10 @@ def load_form():
     month_id = request.form.get("month_id")
     country_id = request.form.get("country_id")
 
+    source_type = request.form.get("source_type")
+    source_url = request.form.get("source_url")
+
+
     # Mettre à jour les variables de l'application
     if model_id:
         app.config['CURRENT_MODEL_ID'] = model_id
@@ -60,6 +64,10 @@ def load_form():
         app.config['CURRENT_MONTH_ID'] = month_id
     if country_id:
         app.config['CURRENT_COUNTRY_ID'] = country_id
+    if source_type:
+        app.config['SOURCE_TYPE'] = source_type
+    if source_url:
+        app.config['SOURCE_URL'] = source_url
 
 # Page d'accueil
 @app.route("/")
@@ -160,10 +168,22 @@ def mode_photo_result():
     return render_template("mode_photo_result.html", output_dict=output_dict, app_dict=app.config)
 
 
-@app.route("/mode_video", methods=["POST"])
+
+@app.route("/mode_video_page", methods=["GET", "POST"])
+def mode_video_page():
+    return render_template('mode_video.html', app_dict=app.config)
+
+
+@app.route("/mode_video", methods=["POST", "GET"])
 def mode_video():
-    load_form()
-    return render_template("mode_photo.html", app_dict=app.config)
+    if request.method == "POST":
+        load_form()  
+
+    return Response(generate_frame(config_dict=app.config, models=models), mimetype="multipart/x-mixed-replace; boundary=frame")
+
+
+
+
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 8080)), debug=True)
