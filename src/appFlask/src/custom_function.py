@@ -8,6 +8,8 @@ import unicodedata
 from werkzeug.utils import secure_filename
 import os
 
+import math
+
 
 def get_all_weights_from_bucket():
     """
@@ -252,3 +254,62 @@ def clean_filename(filename):
 # Fonction pour vérifier l'extension du fichier image
 def allowed_file(filename):
     return "." in filename and filename.rsplit(".", 1)[1].lower() in {"jpg", "jpeg"}
+
+
+def generate_frame(config_dict):
+    cap = cv2.VideoCapture(0)
+
+    while True:
+        success, img = cap.read()
+        results = config_dict['model']
+
+        # coordinates
+        for r in results:
+            boxes = r.boxes
+
+            for box in boxes:
+                # bounding box
+                x1, y1, x2, y2 = box.xyxy[0]
+                x1, y1, x2, y2 = int(x1), int(y1), int(x2), int(y2) # convert to int values
+                
+                # confidence
+                confidence = math.ceil((box.conf[0]*100))/100
+                print("Confidence --->",confidence)
+
+                # class name
+                cls = int(box.cls[0]) 
+                
+                        
+                # Détermination de la saisonnalité du fruit
+                fruit_months = ["01", "02", "03"]
+                current_month = "05" # Mois actuel
+                all_months = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"]
+
+                # Vérification de la saisonnalité
+                if current_month in fruit_months:
+                    seasonality = "2"  # En saison
+                    color = (0, 255, 0)
+                elif current_month in ["01", "02", "03","04","12"]:
+                    seasonality = "1"  # Hors saison proche
+                    color = (0, 165, 255)
+                else:
+                    seasonality = "0"  # Hors saison
+                    color = (0, 0, 255)
+
+                # put box in cam
+                cv2.rectangle(img, (x1, y1), (x2, y2), color, 3)
+
+                # object details
+                org = [x1, y1]
+                font = cv2.FONT_HERSHEY_SIMPLEX
+                fontScale = 1
+                color = (255, 0, 0)
+                thickness = 2
+
+                cv2.putText(img, config_dict['classes'][cls], org, font, fontScale, color, thickness)
+
+        cv2.imshow('Video', img)
+        if cv2.waitKey(1) == ord('q'):
+            break
+
+    cap.release()

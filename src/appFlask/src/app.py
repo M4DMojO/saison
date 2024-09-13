@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, Response
 from datetime import datetime
 import cv2
 import json
@@ -6,7 +6,7 @@ import logging
 import os
 
 from model import load_models, get_results
-from custom_function import allowed_file, clean_filename, draw_bounding_boxes
+from custom_function import allowed_file, clean_filename, draw_bounding_boxes, generate_frame
  
 app = Flask(__name__)
 
@@ -163,7 +163,9 @@ def mode_photo_result():
 @app.route("/mode_video", methods=["POST"])
 def mode_video():
     load_form()
-    return render_template("mode_photo.html", app_dict=app.config)
+    config_dict = { 'model' : models[int(app.config.get('CURRENT_MODEL_ID', '0'))],
+                   'classes' :  app.config['FRUITS'].values}
+    return Response(generate_frame(), mimetype="multipart/x-mixed-replace; boundary=frame")
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 8080)), debug=True)
