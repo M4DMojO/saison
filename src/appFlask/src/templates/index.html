@@ -10,7 +10,7 @@
 <body>
     <form method="post"> 
         <div>
-            <h1>S<span>AI</span>son </h1>
+            <h1>s<span>AI</span>son </h1>
 
             <select name="model_id">
                 {% for id, model in app_dict['MODELS'].items() %}
@@ -45,7 +45,7 @@
             
             <button type="submit" formaction="{{ url_for('mode_photo') }}">Mode photo</button>
             <br/>
-            <button type="submit" formaction="{{ url_for('mode_video') }}">Mode vidéo</button>
+            <button type="submit" formaction="{{ url_for('mode_video_page') }}">Mode vidéo</button>
         </div>
     </form>
 </body>

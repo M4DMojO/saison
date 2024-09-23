@@ -10,5 +10,8 @@ setuptools.setup(
         "opencv-python==4.10.0.84"
         "Flask==3.0.3"
         "ultralytics==8.2.90"
+        "tensorflow==2.17.0"
+        "google-clood==0.34.0"
+        "google-cloud-storage==2.18.2"
     ],
 )

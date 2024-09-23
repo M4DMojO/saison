@@ -1,3 +1,5 @@
+#for credentials
+.credentials/*
 #for models
 *.h5
 
@@ -189,9 +191,13 @@ _brut/
 # fichier de poids 
 #*.pt
 
+# fichier keras
+*.keras
+
 # fichier nohup
 # nohup.out # on garde pour avoir une trace des entrainements 
 
 
 # dossier stockage image
 uploads/
+
